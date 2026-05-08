@@ -45,8 +45,9 @@ pub fn handler(ctx: Context<DistributeRewards>) -> Result<()> {
     let signer_seeds: &[&[u8]] = &[MINT_AUTH_SEED, &[mint_auth_bump]];
     let signer = &[signer_seeds];
 
+    // En anchor 1.0.2, CpiContext::new_with_signer toma Pubkey no AccountInfo
     let cpi_ctx = CpiContext::new_with_signer(
-        ctx.accounts.token_program.to_account_info(),
+        anchor_spl::token::ID,
         MintTo {
             mint: ctx.accounts.trend_mint.to_account_info(),
             to: ctx.accounts.streamer_ata.to_account_info(),

@@ -22,19 +22,23 @@ describe("trendingcast", () => {
   const buyer1 = Keypair.generate();
 
   before(async () => {
-    // Fondear wallets de test con SOL para pagar txs
-    const airdropAndConfirm = async (kp: Keypair) => {
-      const sig = await provider.connection.requestAirdrop(
-        kp.publicKey,
-        2 * anchor.web3.LAMPORTS_PER_SOL
-      );
-      await provider.connection.confirmTransaction(sig, "confirmed");
-    };
-
-    await airdropAndConfirm(streamer1);
-    await airdropAndConfirm(streamer2);
-    await airdropAndConfirm(buyer1);
+    await fundWallet(streamer1.publicKey);
+    await fundWallet(streamer2.publicKey);
+    await fundWallet(buyer1.publicKey);
   });
+
+  // ─── Helper: fondear wallet desde el provider (evita airdrop rate limit) ────
+
+  const fundWallet = async (to: PublicKey, sol = 0.3) => {
+    const tx = new anchor.web3.Transaction().add(
+      anchor.web3.SystemProgram.transfer({
+        fromPubkey: provider.wallet.publicKey,
+        toPubkey: to,
+        lamports: sol * anchor.web3.LAMPORTS_PER_SOL,
+      })
+    );
+    await provider.sendAndConfirm(tx);
+  };
 
   // ─── Helpers PDA ────────────────────────────────────────────────────────────
 
@@ -77,7 +81,7 @@ describe("trendingcast", () => {
     const [profilePDA] = findProfilePDA(streamer1.publicKey);
 
     await program.methods
-      .createProfile("gaming", [20, 21, 22])
+      .createProfile("gaming", Buffer.from([20, 21, 22]))
       .accounts({
         profile: profilePDA,
         wallet: streamer1.publicKey,
@@ -89,24 +93,22 @@ describe("trendingcast", () => {
     const profile = await program.account.streamerProfile.fetch(profilePDA);
     assert.equal(profile.wallet.toBase58(), streamer1.publicKey.toBase58());
     assert.equal(profile.category, "gaming");
-    assert.deepEqual(profile.hours, [20, 21, 22]);
+    // hours se decodea como Buffer en @anchor-lang/core — convertir a array para comparar
+    assert.deepEqual(Array.from(profile.hours as any), [20, 21, 22]);
     assert.isAbove(profile.createdAt.toNumber(), 0);
     console.log("  ✓ Perfil creado:", profilePDA.toBase58());
   });
 
-  it("rejects profile with invalid category (empty string)", async () => {
+  it("rejects profile with invalid category (too long)", async () => {
     const dummy = Keypair.generate();
-    const sig = await provider.connection.requestAirdrop(
-      dummy.publicKey,
-      anchor.web3.LAMPORTS_PER_SOL
-    );
-    await provider.connection.confirmTransaction(sig);
+    await fundWallet(dummy.publicKey, 0.1);
 
     const [profilePDA] = findProfilePDA(dummy.publicKey);
+    const tooLong = "a".repeat(33); // 33 chars > límite de 32
 
     try {
       await program.methods
-        .createProfile("", [20])
+        .createProfile(tooLong, Buffer.from([20]))
         .accounts({
           profile: profilePDA,
           wallet: dummy.publicKey,
@@ -114,26 +116,22 @@ describe("trendingcast", () => {
         })
         .signers([dummy])
         .rpc();
-      assert.fail("Debería haber fallado con categoría vacía");
+      assert.fail("Debería haber fallado con categoría > 32 chars");
     } catch (err: any) {
       assert.include(err.toString(), "InvalidCategory");
-      console.log("  ✓ Error correcto para categoría vacía");
+      console.log("  ✓ Error correcto para categoría demasiado larga");
     }
   });
 
   it("rejects profile with invalid hour (>= 24)", async () => {
     const dummy = Keypair.generate();
-    const sig = await provider.connection.requestAirdrop(
-      dummy.publicKey,
-      anchor.web3.LAMPORTS_PER_SOL
-    );
-    await provider.connection.confirmTransaction(sig);
+    await fundWallet(dummy.publicKey, 0.1);
 
     const [profilePDA] = findProfilePDA(dummy.publicKey);
 
     try {
       await program.methods
-        .createProfile("music", [25]) // hora inválida
+        .createProfile("music", Buffer.from([25])) // hora inválida
         .accounts({
           profile: profilePDA,
           wallet: dummy.publicKey,
