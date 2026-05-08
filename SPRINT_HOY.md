@@ -153,4 +153,7 @@ VITE_BACKEND_URL=http://localhost:3000
 | Mediodía | Backend corre (`/health` responde). Frontend levanta con wallet connect. |
 | 4pm | `GET /recommendations/:wallet` devuelve datos reales on-chain. Dashboard muestra recomendación. |
 | 6pm | Flow completo integrado. Al menos una compra de template funciona (con bypass en dev). |
-| Noche | Buffer para bugs + grabación del demo. |
+| Noche | Buffer para bugs. Código congelado. |
+
+> Demo y README final → mañana por la mañana, antes del mediodía del domingo (entrega).
+> No grabar con código inestable.
