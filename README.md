@@ -1,19 +1,29 @@
 # TrendingCast
 
-Decentralized marketplace on Solana where streamers buy and sell content templates using USDC micropayments via the [x402 protocol](https://x402.org). Reputation is calculated entirely on-chain.
+AI-powered trending topic recommendation system for emerging streamers — built on Solana. TrendingCast analyzes what's trending across platforms and delivers personalized content recommendations on-chain, so streamers know exactly what to stream, when, and with what template.
+
+As a plus, streamers can buy and sell content templates (CTAs, stream openers, hooks) using USDC micropayments via the [x402 protocol](https://x402.org), with reputation calculated entirely on-chain.
 
 Built for the **Dev3Pack Hackathon**.
 
 ---
 
+## The Problem
+
+Emerging streamers don't know what to stream. They pick topics too late, miss trending moments, and lose potential growth. Existing tools are either too generic or locked behind expensive subscriptions.
+
+## The Solution
+
+TrendingCast gives every streamer a personalized, on-chain recommendation: which topics are trending in their category, the best hour to go live today, and a ready-to-use content template — all verifiable and immutable on Solana devnet.
+
+---
+
 ## What it does
 
-- Streamers create a profile with their content category and preferred streaming hours
-- Content creators list templates (short texts, CTAs, stream openers — up to 256 chars)
-- Buyers pay in USDC via x402 HTTP 402 flow; the facilitator handles settlement
-- Every sale is recorded on-chain as an immutable `X402PaymentReceipt`
-- Reputation scores are computed on-chain: `success_rate × total_sales + tokens_earned/1e9 + total_purchases × 2`
-- Top creators earn TREND tokens distributed by the `distribute_rewards` instruction
+1. **Recommendation engine** — Backend fetches trending topics per category, determines the optimal streaming hour, and stores the recommendation on-chain via `save_recommendation`
+2. **Streamer profiles** — Each streamer registers their category and preferred hours; the engine uses this to personalize recommendations
+3. **Template marketplace** — Creators sell proven content templates; buyers pay in USDC via x402 HTTP 402 flow; every sale is recorded as an immutable `X402PaymentReceipt`
+4. **On-chain reputation** — Score computed as `success_rate × total_sales + tokens_earned/1e9 + total_purchases × 2`; top performers earn TREND tokens
 
 ---
 
@@ -37,6 +47,22 @@ x402 facilitator: `https://x402.org/facilitator`
 | Backend | Node 20 + Express + TypeScript + `@x402/express` |
 | Frontend | React 18 + Vite + Tailwind + `@solana/wallet-adapter-react` |
 | Network | Solana devnet only |
+
+---
+
+## Architecture
+
+```
+[Frontend React] ──fetch with X-PAYMENT──> [Backend Express + @x402/express]
+                       ↑                              │
+                  recommendations                     ├──> Trending topics APIs
+                  + templates                         ├──> AI recommendation engine
+                                                      ├──> [x402.org/facilitator] (verify + settle)
+                                                      └──> [Anchor program on devnet]
+                                                              save_recommendation
+                                                              record_template_sale
+                                                              calculate_reputation
+```
 
 ---
 
@@ -114,10 +140,10 @@ npm run dev
 
 ## Program Instructions
 
-| Instruction | Description |
-|-------------|-------------|
+| Instruction | Purpose |
+|-------------|---------|
 | `create_profile` | Register a streamer profile (category + preferred hours) |
-| `save_recommendation` | Store an AI-generated content recommendation on-chain |
+| `save_recommendation` | Store an AI-generated recommendation on-chain (topics, best hour, template text) |
 | `record_template_sale` | Record an x402-verified purchase; creates receipt + bumps reputation |
 | `calculate_reputation` | Recalculate on-chain reputation score |
 | `distribute_rewards` | Mint TREND tokens to a streamer (requires SPL mint authority) |
@@ -126,13 +152,13 @@ npm run dev
 
 ## PDAs
 
-| Account | Seeds |
-|---------|-------|
-| `StreamerProfile` | `["profile", wallet]` |
-| `StreamerReputation` | `["reputation", wallet]` |
-| `StreamTemplate` | `["template", creator, template_id (u32 LE)]` |
-| `X402PaymentReceipt` | `["payment", buyer, template_pubkey]` |
-| `Recommendation` | `["recommendation", streamer, timestamp (i64 LE)]` |
+| Account | Seeds | What it stores |
+|---------|-------|---------------|
+| `StreamerProfile` | `["profile", wallet]` | Category, preferred hours |
+| `Recommendation` | `["recommendation", streamer, timestamp]` | Trending topics, best hour, template text |
+| `StreamTemplate` | `["template", creator, template_id]` | Content, price, sales count |
+| `X402PaymentReceipt` | `["payment", buyer, template_pubkey]` | Payment proof, x402 signature |
+| `StreamerReputation` | `["reputation", wallet]` | Score, sales, purchases, tokens earned |
 
 ---
 

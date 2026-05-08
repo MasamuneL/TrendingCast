@@ -17,6 +17,17 @@ Estado actual: smart contract deployado en devnet (7/8 tests passing). Backend y
 
 ### Backend — `backend/` (Node 20 + Express + TypeScript)
 
+**Core: motor de recomendaciones** (esto es el producto principal)
+
+| Tarea | Archivo objetivo | Notas |
+|-------|-----------------|-------|
+| Fetch tópicos trending por categoría | `backend/src/services/trending.ts` | Fuente: Twitch Helix API, YouTube Trends, o Google Trends. Filtrar por categoría del streamer |
+| Motor de recomendación: determinar mejor hora | `backend/src/services/recommender.ts` | Cruzar trending topics con `StreamerProfile.hours` para sugerir el mejor slot |
+| Handler: guardar recomendación on-chain | `backend/src/handlers/saveRecommendation.ts` | Llama `save_recommendation` con topics + best_hour + template_text generado |
+| Ruta pública: obtener recomendación del día | `backend/src/routes/recommendations.ts` | GET `/recommendations/:wallet` — devuelve la rec más reciente on-chain |
+
+**Marketplace x402** (el plus)
+
 | Tarea | Archivo objetivo | Notas |
 |-------|-----------------|-------|
 | Setup Express + `@x402/express` middleware | `backend/src/index.ts` | Configura `paymentMiddleware` con USDC mint devnet y facilitator URL |
@@ -35,6 +46,7 @@ Estado actual: smart contract deployado en devnet (7/8 tests passing). Backend y
 |-------|-----------------|-------|
 | Setup Vite + Tailwind + wallet adapter | `web/` | `@solana/wallet-adapter-react`, `@solana/wallet-adapter-phantom` |
 | Componente: conectar wallet | `web/src/components/WalletButton.tsx` | Botón connect/disconnect |
+| **Página: dashboard de recomendaciones** | `web/src/pages/Dashboard.tsx` | Vista principal — muestra topics del día, mejor hora, template sugerido |
 | Página: marketplace de templates | `web/src/pages/Marketplace.tsx` | Lista templates con precio y creator |
 | Flujo de compra x402 | `web/src/lib/buy.ts` | Llama backend con header `X-PAYMENT`; usa `x402-solana/client` |
 | Página: perfil de streamer | `web/src/pages/Profile.tsx` | Muestra reputación, ventas, historial |
@@ -42,24 +54,30 @@ Estado actual: smart contract deployado en devnet (7/8 tests passing). Backend y
 
 ### Integración y demo
 
-| Tarea | Responsable | Notas |
-|-------|------------|-------|
-| Flow de compra end-to-end probado | — | Frontend → Backend → x402 facilitator → on-chain |
-| Test `distribute_rewards` | — | Crear mint TREND en devnet, ATA del streamer, luego llamar la instrucción |
-| Video demo grabado | — | Mostrar: crear perfil → listar template → comprar → ver reputación actualizada |
+| Tarea | Notas |
+|-------|-------|
+| Flow de recomendación end-to-end | Backend fetcha trends → guarda on-chain → frontend muestra al streamer |
+| Flow de compra end-to-end | Frontend → Backend → x402 facilitator → on-chain |
+| Test `distribute_rewards` | Crear mint TREND en devnet, ATA del streamer, llamar instrucción |
+| Video demo | Mostrar: crear perfil → ver recomendación del día → comprar template → ver reputación |
 
 ---
 
 ## Arquitectura de referencia
 
 ```
-[Frontend React] ──fetch con X-PAYMENT──> [Backend Express + @x402/express]
-                                                      │
-                                                      ├──> [x402.org/facilitator] (verify + settle)
-                                                      │
-                                                      └──> [Programa Anchor en devnet]
-                                                            record_template_sale
-                                                            calculate_reputation
+[Frontend React]
+      │
+      ├── GET /recommendations/:wallet ──> [Backend Express]
+      │                                          │
+      │                                          ├──> Trending APIs (Twitch, YouTube, etc.)
+      │                                          ├──> Recommendation engine (topics + best hour)
+      │                                          └──> save_recommendation (on-chain)
+      │
+      └── POST /buy/:templateId ──────> [Backend + @x402/express]
+                                               │
+                                               ├──> [x402.org/facilitator] (verify + settle)
+                                               └──> record_template_sale (on-chain)
 ```
 
-El backend **nunca** mueve USDC directamente. El facilitator hace el settlement. El smart contract solo registra recibos una vez que el middleware confirmó el pago.
+El backend **nunca** mueve USDC directamente. El facilitator hace el settlement. El smart contract registra recomendaciones y recibos de pago como datos inmutables en devnet.

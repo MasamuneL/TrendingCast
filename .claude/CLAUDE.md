@@ -1,6 +1,6 @@
 ## Proyecto: TrendingCast
  
-Marketplace descentralizado en Solana para que streamers compren y vendan templates de contenido usando micropagos USDC vía el protocolo x402. La reputación se calcula on-chain. Construido para el hackathon Dev3Pack.
+Sistema de recomendaciones de tópicos trending para streamers emergentes, construido en Solana. El backend analiza qué está en tendencia por categoría y guarda recomendaciones personalizadas on-chain (topics, mejor hora para streamear, template de contenido listo para usar). Como plus, los streamers pueden comprar y vender templates de contenido usando micropagos USDC vía el protocolo x402, con reputación calculada on-chain. Construido para el hackathon Dev3Pack.
  
 **Estado actual:** Smart contract deployado en devnet (7/8 tests passing). Backend y frontend sin empezar.
  
