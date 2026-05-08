@@ -2,7 +2,7 @@
  
 Marketplace descentralizado en Solana para que streamers compren y vendan templates de contenido usando micropagos USDC vía el protocolo x402. La reputación se calcula on-chain. Construido para el hackathon Dev3Pack.
  
-**Estado actual:** <ACTUALIZAR — ej: "Smart contract deployado en devnet, backend en progreso, frontend sin empezar">
+**Estado actual:** Smart contract deployado en devnet (7/8 tests passing). Backend y frontend sin empezar.
  
 ## Stack
  
@@ -79,7 +79,7 @@ cd web && npm run dev
 - **Faucets:** SOL → faucet.solana.com, USDC → faucet.circle.com
 ## Program ID
  
-Devnet: `<PEGAR DESPUÉS DEL PRIMER DEPLOY>`
+Devnet: `CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD`
  
 Si cambia este Program ID, actualizar en:
 - `programs/trendingcast/src/lib.rs` (`declare_id!`)
@@ -94,15 +94,17 @@ Si cambia este Program ID, actualizar en:
 - Trabajar siempre en feature branch, PR a main. Ver `.claude/rules/git-workflow.md`.
 - Aritmética on-chain con `saturating_*` o `checked_*`. Nunca operadores raw en valores externos.
 ## Estado / TODO
- 
-- [ ] Smart contract con 5 instrucciones implementadas
-- [ ] Deploy del contrato a devnet
+
+Ver `ROADMAP.md` para el desglose completo por área y responsable.
+
+- [x] Smart contract con 5 instrucciones implementadas
+- [x] Deploy del contrato a devnet
+- [x] README con setup guide y deployment addresses
 - [ ] Backend con middleware x402 funcionando
 - [ ] Handlers backend → Anchor (record_sale, update_reputation)
 - [ ] Frontend con marketplace y wallet integration
 - [ ] Flow de compra end-to-end probado
 - [ ] Video demo grabado
-- [ ] README final
 ## Gotchas
  
 - **`anchor build` genera un Program ID nuevo si no existe el keypair en `target/deploy/`.** Si cambia, sincronizar con `anchor keys sync` y actualizar todos los lugares listados arriba.
