@@ -1,6 +1,5 @@
 import { Router, Request, Response } from "express";
 import { getProgram } from "../solana/client";
-import { PROGRAM_ID } from "../solana/pdas";
 
 const router = Router();
 
@@ -23,7 +22,8 @@ router.get("/", async (_req: Request, res: Response) => {
       }))
     );
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    console.error("[templates] fetch error:", err);
+    res.status(500).json({ error: "Failed to fetch templates" });
   }
 });
 
