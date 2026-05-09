@@ -19,11 +19,10 @@ router.post("/:templateId", async (req: Request, res: Response) => {
     // en dev se puede bypassear el pago
     const bypassPayment = process.env.NODE_ENV === "development" && req.headers["x-bypass-payment"] === "true";
 
-    // extraer info del pago verificado por el middleware x402
-    // FIXME: la forma exacta del header depende de la versión de @x402/express
-    const paymentHeader = Array.isArray(req.headers["x-payment-response"])
-      ? req.headers["x-payment-response"][0]
-      : req.headers["x-payment-response"];
+    // extraer info del pago del header X-PAYMENT enviado por el cliente
+    // el middleware x402 ya verificó que el pago es válido antes de llegar aquí
+    const rawHeader = req.headers["x-payment"] ?? req.headers["x-payment-response"];
+    const paymentHeader = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader;
     let x402TxSignature = "bypass_" + Date.now();
     let buyerWallet = req.body.buyer as string;
     let amountUsdc = 100_000; // $0.10 default
@@ -31,9 +30,12 @@ router.post("/:templateId", async (req: Request, res: Response) => {
     if (!bypassPayment && paymentHeader) {
       try {
         const payment = JSON.parse(Buffer.from(paymentHeader, "base64").toString());
-        x402TxSignature = payment.signature ?? x402TxSignature;
-        buyerWallet = payment.payer ?? buyerWallet;
-        amountUsdc = payment.amount ?? amountUsdc;
+        // x402 v2: { x402Version: 2, accepted: { amount }, payload: { from/payer, signature } }
+        // x402 v1: { signature, payer, amount }
+        const p = payment?.payload ?? payment;
+        x402TxSignature = p?.signature ?? p?.transaction ?? x402TxSignature;
+        buyerWallet = p?.from ?? p?.payer ?? payment?.accepted?.from ?? buyerWallet;
+        amountUsdc = parseInt(payment?.accepted?.amount ?? payment?.amount ?? String(amountUsdc), 10);
       } catch {
         res.status(402).json({ error: "Malformed payment header" });
         return;
