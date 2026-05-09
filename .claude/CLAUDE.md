@@ -2,7 +2,7 @@
  
 Sistema de recomendaciones de tópicos trending para streamers emergentes, construido en Solana. El backend analiza qué está en tendencia por categoría y guarda recomendaciones personalizadas on-chain (topics, mejor hora para streamear, template de contenido listo para usar). Como plus, los streamers pueden comprar y vender templates de contenido usando micropagos USDC vía el protocolo x402, con reputación calculada on-chain. Construido para el hackathon Dev3Pack.
  
-**Estado actual:** Smart contract deployado en devnet (7/8 tests passing). Backend y frontend sin empezar.
+**Estado actual:** Smart contract deployado en devnet (7/8 tests passing). Backend completo en `feat/backend`. Frontend sin empezar.
  
 ## Stack
  
@@ -79,7 +79,7 @@ cd web && npm run dev
 - **Faucets:** SOL → faucet.solana.com, USDC → faucet.circle.com
 ## Program ID
  
-Devnet: `CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD`
+Devnet: `7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR`
  
 Si cambia este Program ID, actualizar en:
 - `programs/trendingcast/src/lib.rs` (`declare_id!`)
@@ -100,8 +100,9 @@ Ver `ROADMAP.md` para el desglose completo por área y responsable.
 - [x] Smart contract con 5 instrucciones implementadas
 - [x] Deploy del contrato a devnet
 - [x] README con setup guide y deployment addresses
-- [ ] Backend con middleware x402 funcionando
-- [ ] Handlers backend → Anchor (record_sale, update_reputation)
+- [x] Backend con middleware x402 funcionando (`feat/backend`, PR pendiente a main)
+- [x] Handlers backend → Anchor (record_sale, update_reputation, save_recommendation)
+- [x] API reference para el frontend (`backend/API.md`)
 - [ ] Frontend con marketplace y wallet integration
 - [ ] Flow de compra end-to-end probado
 - [ ] Video demo grabado
@@ -113,6 +114,13 @@ Ver `ROADMAP.md` para el desglose completo por área y responsable.
 - **El facilitator espera direcciones Solana base58 en `payTo`.** Si pasas una address EVM (0x...), falla con un error confuso.
 - **Anchor 1.0.2 cambió la firma del constructor `Program`:** ahora es `new Program(idl, provider)` — el program ID se lee del IDL. Si encuentras docs con `new Program(idl, programId, provider)`, son viejas.
 - **El cluster de Solana se setea por comando, no por sesión.** Siempre incluir `--provider.cluster devnet` en deploys y tests para evitar accidentes.
+- **`anchor deploy` falla si se pierde el keypair de upgrade authority.** Fix: `solana-keygen new --force` → nuevo Program ID → actualizar los 4 lugares. Para redeploys usar `solana program deploy target/deploy/trendingcast.so`, no `anchor program deploy` (falla al inicializar IDL en devnet).
+- **`AccountInfo<'info>` está deprecado en Anchor 1.0.2.** Usar `UncheckedAccount<'info>` con `/// CHECK:` comment.
+- **El backend no puede firmar como usuario.** Las instrucciones que antes requerían `buyer: Signer` o `streamer: Signer` usan `UncheckedAccount` para esos wallets y un `authority: Signer` (backend wallet) como pagador. La seguridad la da la derivación del PDA.
+- **`HTTPFacilitatorClient` NO está en `@x402/express`.** Importar de `@x402/core/server`.
+- **`@x402/express` requiere `"module": "Node16"` y `"moduleResolution": "node16"` en tsconfig.** Sus types son ESM-only.
+- **Queries sin discriminador devuelven cuentas de otro tipo.** Usar `program.account.<nombre>.all([memcmp])` — nunca `connection.getProgramAccounts(...)` raw sin el filtro de discriminador de 8 bytes.
+- **Twitch OAuth:** el token request va con `Content-Type: application/x-www-form-urlencoded` y params en el body, no en query string.
 ## Dónde Mirar Primero
  
 - Lógica de verificación de pago: `backend/src/index.ts` (config del middleware)

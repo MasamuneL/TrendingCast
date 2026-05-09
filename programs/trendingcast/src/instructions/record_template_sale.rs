@@ -9,7 +9,7 @@ pub struct RecordTemplateSale<'info> {
     // El template se crea si no existe (primera compra crea el registro)
     #[account(
         init_if_needed,
-        payer = buyer,
+        payer = authority,
         space = 8 + StreamTemplate::INIT_SPACE,
         seeds = [TEMPLATE_SEED, creator.key().as_ref(), &template_id.to_le_bytes()],
         bump,
@@ -19,7 +19,7 @@ pub struct RecordTemplateSale<'info> {
     // Recibo único por (buyer, template) — previene doble compra
     #[account(
         init,
-        payer = buyer,
+        payer = authority,
         space = 8 + X402PaymentReceipt::INIT_SPACE,
         seeds = [PAYMENT_SEED, buyer.key().as_ref(), template.key().as_ref()],
         bump,
@@ -29,7 +29,7 @@ pub struct RecordTemplateSale<'info> {
     // Reputación del creator (se crea si no existe)
     #[account(
         init_if_needed,
-        payer = buyer,
+        payer = authority,
         space = 8 + StreamerReputation::INIT_SPACE,
         seeds = [REPUTATION_SEED, creator.key().as_ref()],
         bump,
@@ -39,18 +39,21 @@ pub struct RecordTemplateSale<'info> {
     // Reputación del comprador (se crea si no existe)
     #[account(
         init_if_needed,
-        payer = buyer,
+        payer = authority,
         space = 8 + StreamerReputation::INIT_SPACE,
         seeds = [REPUTATION_SEED, buyer.key().as_ref()],
         bump,
     )]
     pub buyer_reputation: Account<'info, StreamerReputation>,
 
-    #[account(mut)]
-    pub buyer: Signer<'info>,
+    /// CHECK: pubkey del comprador; los seeds de payment_receipt y buyer_reputation ya lo vinculan
+    pub buyer: UncheckedAccount<'info>,
 
-    /// CHECK: solo necesitamos la pubkey del creator para derivar PDAs. No firman.
+    /// CHECK: solo necesitamos la pubkey del creator para derivar PDAs
     pub creator: UncheckedAccount<'info>,
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 }

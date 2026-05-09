@@ -160,9 +160,9 @@ describe("trendingcast", () => {
       .accounts({
         recommendation: recPDA,
         streamer: streamer1.publicKey,
+        authority: provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       })
-      .signers([streamer1])
       .rpc();
 
     const rec = await program.account.recommendation.fetch(recPDA);
@@ -196,9 +196,9 @@ describe("trendingcast", () => {
         buyerReputation: buyerRepPDA,
         buyer: buyer1.publicKey,
         creator: streamer1.publicKey,
+        authority: provider.wallet.publicKey,
         systemProgram: SystemProgram.programId,
       })
-      .signers([buyer1])
       .rpc();
 
     const template = await program.account.streamTemplate.fetch(templatePDA);
@@ -242,7 +242,6 @@ describe("trendingcast", () => {
         reputation: repPDA,
         streamer: streamer1.publicKey,
       })
-      .signers([streamer1])
       .rpc();
 
     const rep = await program.account.streamerReputation.fetch(repPDA);
@@ -270,7 +269,6 @@ describe("trendingcast", () => {
           reputation: wrongPDA, // PDA de streamer2 que no fue inicializada
           streamer: streamer2.publicKey,
         })
-        .signers([streamer2])
         .rpc();
       assert.fail("Debería haber fallado — cuenta no inicializada");
     } catch (err: any) {
