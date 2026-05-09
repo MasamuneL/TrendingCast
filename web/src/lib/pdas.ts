@@ -1,38 +1,37 @@
 import { PublicKey } from '@solana/web3.js'
 import { PROGRAM_ID } from './constants'
 
-export async function getStreamerProfilePDA(wallet: PublicKey): Promise<[PublicKey, number]> {
+// Seeds must match programs/trendingcast/src/constants.rs exactly
+
+export function getStreamerProfilePDA(wallet: PublicKey): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('streamer_profile'), wallet.toBuffer()],
+    [Buffer.from('profile'), wallet.toBuffer()],
     PROGRAM_ID,
   )
 }
 
-export async function getTemplatePDA(templateId: number): Promise<[PublicKey, number]> {
-  // PDAs with numeric id use little-endian 4-byte buffer
+export function getTemplatePDA(creator: PublicKey, templateId: number): [PublicKey, number] {
   const idBuf = Buffer.alloc(4)
   idBuf.writeUInt32LE(templateId, 0)
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('stream_template'), idBuf],
+    [Buffer.from('template'), creator.toBuffer(), idBuf],
     PROGRAM_ID,
   )
 }
 
-export async function getReputationPDA(wallet: PublicKey): Promise<[PublicKey, number]> {
+export function getReputationPDA(wallet: PublicKey): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
     [Buffer.from('reputation'), wallet.toBuffer()],
     PROGRAM_ID,
   )
 }
 
-export async function getPaymentReceiptPDA(
+export function getPaymentReceiptPDA(
   buyer: PublicKey,
-  templateId: number,
-): Promise<[PublicKey, number]> {
-  const idBuf = Buffer.alloc(4)
-  idBuf.writeUInt32LE(templateId, 0)
+  templatePubkey: PublicKey,
+): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from('payment_receipt'), buyer.toBuffer(), idBuf],
+    [Buffer.from('payment'), buyer.toBuffer(), templatePubkey.toBuffer()],
     PROGRAM_ID,
   )
 }

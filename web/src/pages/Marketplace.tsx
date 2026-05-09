@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { useAnchorWallet } from '@solana/wallet-adapter-react'
+import { PublicKey } from '@solana/web3.js'
 import { fetchTemplates, purchaseTemplate, type StreamTemplate } from '../lib/api'
+import { recordTemplateSaleOnChain } from '../lib/anchor'
 import TemplateCard from '../components/TemplateCard'
 
 export default function Marketplace() {
+  const { publicKey } = useWallet()
+  const anchorWallet = useAnchorWallet()
   const [templates, setTemplates] = useState<StreamTemplate[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -17,13 +23,33 @@ export default function Marketplace() {
   }, [])
 
   async function handleBuy(templateId: number) {
-    // TODO: integrate x402 payment flow
-    // 1. Get payment requirements from 402 response
-    // 2. Sign USDC transfer with wallet
-    // 3. Encode as X-PAYMENT header
-    // 4. Call purchaseTemplate with the signed header
-    await purchaseTemplate(templateId, '')
-    // Refresh templates after purchase
+    if (!publicKey || !anchorWallet) {
+      setError('Connect your wallet to purchase templates')
+      return
+    }
+
+    const template = templates.find((t) => t.id === templateId)
+    if (!template) return
+
+    const receipt = await purchaseTemplate(
+      templateId,
+      publicKey.toBase58(),
+      template.creator,
+      template.content,
+      template.category,
+    )
+
+    await recordTemplateSaleOnChain(anchorWallet, {
+      templateId: receipt.templateId,
+      buyer: new PublicKey(receipt.buyer),
+      creator: new PublicKey(receipt.creator),
+      amountUsdc: receipt.amountUsdc,
+      x402TxSignature: receipt.receipt,
+      content: template.content,
+      category: template.category,
+      priceLamports: template.price,
+    })
+
     const updated = await fetchTemplates()
     setTemplates(updated)
   }
@@ -57,6 +83,10 @@ export default function Marketplace() {
         </div>
       </div>
 
+      {error && (
+        <div className="card border-red-800 text-red-400 text-sm">{error}</div>
+      )}
+
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -65,17 +95,13 @@ export default function Marketplace() {
         </div>
       )}
 
-      {error && (
-        <div className="card border-red-800 text-red-400 text-sm">{error}</div>
-      )}
-
-      {!loading && !error && visible.length === 0 && (
+      {!loading && visible.length === 0 && (
         <div className="card text-gray-400 text-sm text-center py-16">
           No templates available yet. Be the first to create one!
         </div>
       )}
 
-      {!loading && !error && visible.length > 0 && (
+      {!loading && visible.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {visible.map((t) => (
             <TemplateCard key={t.id} template={t} onBuy={handleBuy} />
