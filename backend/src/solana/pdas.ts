@@ -6,9 +6,10 @@ const TEMPLATE_SEED = Buffer.from("template");
 const PAYMENT_SEED = Buffer.from("payment");
 const REC_SEED = Buffer.from("recommendation");
 
-export const PROGRAM_ID = new PublicKey(
-  process.env.TRENDINGCAST_PROGRAM_ID ?? "CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD"
-);
+if (!process.env.TRENDINGCAST_PROGRAM_ID) {
+  throw new Error("TRENDINGCAST_PROGRAM_ID env var not set");
+}
+export const PROGRAM_ID = new PublicKey(process.env.TRENDINGCAST_PROGRAM_ID);
 
 export const findProfilePDA = (wallet: PublicKey) =>
   PublicKey.findProgramAddressSync([PROFILE_SEED, wallet.toBuffer()], PROGRAM_ID);
