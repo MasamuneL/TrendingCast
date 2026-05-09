@@ -10,7 +10,7 @@ pub use instructions::*;
 pub use state::*;
 
 // ID temporal — se reemplaza después de `anchor build` con el ID real del keypair
-declare_id!("7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR");
+declare_id!("CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD");
 
 #[program]
 pub mod trendingcast {

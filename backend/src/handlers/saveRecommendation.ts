@@ -1,48 +1,32 @@
-import { BN } from "@anchor-lang/core";
-import { PublicKey, SystemProgram } from "@solana/web3.js";
-import { getProgram, getWallet } from "../solana/client";
-import { findRecPDA, findProfilePDA } from "../solana/pdas";
+import { PublicKey } from "@solana/web3.js";
+import { getProgram } from "../solana/client";
+import { findProfilePDA } from "../solana/pdas";
 import { generateRecommendation } from "../services/recommender";
 
-export const saveRecommendationOnChain = async (streamerWallet: string) => {
+export interface RecommendationData {
+  topics: string[];
+  bestHour: number;
+  templateText: string;
+  timestamp: number;
+}
+
+// Genera datos de recomendación leyendo el perfil on-chain.
+// El frontend es quien firma y guarda la cuenta Recommendation en devnet.
+export const getRecommendationData = async (streamerWallet: string): Promise<RecommendationData> => {
   const program = getProgram();
-  // FIXME: program.account y program.methods son any — sin tipos generados por anchor build
   const accs = program.account as any;
-  const methods = program.methods as any;
   const streamer = new PublicKey(streamerWallet);
 
   const [profilePDA] = findProfilePDA(streamer);
   const profile = await accs.streamerProfile.fetch(profilePDA);
 
-  const category = profile.category;
-  const preferredHours = Array.from(profile.hours as Uint8Array);
+  const category: string = profile.category;
+  const preferredHours: number[] = Array.from(profile.hours as Uint8Array);
 
-  const { topics, bestHour, templateText } = await generateRecommendation(
-    category,
-    preferredHours
-  );
-
+  const { topics, bestHour, templateText } = await generateRecommendation(category, preferredHours);
   const timestamp = Math.floor(Date.now() / 1000);
-  const [recPDA] = findRecPDA(streamer, timestamp);
 
-  const authority = getWallet().publicKey;
+  console.info("[getRecommendation] wallet=%s category=%s topics=%j bestHour=%d", streamerWallet, category, topics, bestHour);
 
-  await methods
-    .saveRecommendation(
-      new BN(timestamp),
-      topics,
-      bestHour,
-      templateText
-    )
-    .accounts({
-      recommendation: recPDA,
-      streamer,
-      authority,
-      systemProgram: SystemProgram.programId,
-    } as any)
-    .rpc();
-
-  console.info("[saveRecommendation] wallet=%s topics=%j bestHour=%d ts=%d", streamerWallet, topics, bestHour, timestamp);
-
-  return { topics, bestHour, templateText, timestamp, pda: recPDA.toBase58() };
+  return { topics, bestHour, templateText, timestamp };
 };

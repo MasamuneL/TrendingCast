@@ -7,7 +7,7 @@ const PAYMENT_SEED = Buffer.from("payment");
 const REC_SEED = Buffer.from("recommendation");
 
 export const PROGRAM_ID = new PublicKey(
-  process.env.TRENDINGCAST_PROGRAM_ID ?? "7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR"
+  process.env.TRENDINGCAST_PROGRAM_ID ?? "CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD"
 );
 
 export const findProfilePDA = (wallet: PublicKey) =>

@@ -2,6 +2,7 @@ import * as anchor from "@anchor-lang/core";
 import { Program } from "@anchor-lang/core";
 import { Connection, Keypair } from "@solana/web3.js";
 import fs from "fs";
+import os from "os";
 import path from "path";
 
 // importar JSON para evitar el conflicto de rootDir con target/types/*.ts
@@ -14,7 +15,7 @@ let _program: AnyProgram | null = null;
 export const getProgram = (): AnyProgram => {
   if (_program) return _program;
 
-  const keypairPath = process.env.WALLET_KEYPAIR_PATH ?? `${process.env.HOME}/.config/solana/id.json`;
+  const keypairPath = process.env.WALLET_KEYPAIR_PATH ?? path.join(os.homedir(), ".config", "solana", "id.json");
   const keypairData = JSON.parse(fs.readFileSync(keypairPath, "utf-8"));
   const keypair = Keypair.fromSecretKey(Uint8Array.from(keypairData));
 

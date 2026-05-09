@@ -1,11 +1,11 @@
 import { Router, Request, Response } from "express";
 import { PublicKey } from "@solana/web3.js";
 import { getProgram } from "../solana/client";
-import { saveRecommendationOnChain } from "../handlers/saveRecommendation";
+import { getRecommendationData } from "../handlers/saveRecommendation";
 
 const router = Router();
 
-// GET /recommendations/:wallet — devuelve la recomendación más reciente on-chain
+// GET /recommendations/:wallet — devuelve la recomendación más reciente guardada on-chain por el frontend
 router.get("/:wallet", async (req: Request, res: Response) => {
   let streamer: PublicKey;
   try {
@@ -17,8 +17,6 @@ router.get("/:wallet", async (req: Request, res: Response) => {
 
   try {
     const program = getProgram();
-
-    // usar program.account para que Anchor agregue el filtro de discriminador automáticamente
     const all = await (program.account as any).recommendation.all([
       { memcmp: { offset: 8, bytes: streamer.toBase58() } },
     ]);
@@ -44,7 +42,9 @@ router.get("/:wallet", async (req: Request, res: Response) => {
   }
 });
 
-// POST /recommendations/:wallet/generate — genera y guarda una nueva recomendación on-chain
+// POST /recommendations/:wallet/generate
+// Genera topics, bestHour y templateText leyendo el perfil on-chain.
+// No escribe on-chain — el frontend firma y ejecuta save_recommendation con el wallet del usuario.
 router.post("/:wallet/generate", async (req: Request, res: Response) => {
   let wallet: PublicKey;
   try {
@@ -55,10 +55,9 @@ router.post("/:wallet/generate", async (req: Request, res: Response) => {
   }
 
   try {
-    const result = await saveRecommendationOnChain(wallet.toBase58());
+    const result = await getRecommendationData(wallet.toBase58());
     res.json(result);
   } catch (err: any) {
-    // error claro cuando no existe el perfil
     if (err.message?.includes("Account does not exist") || err.message?.includes("has no data")) {
       res.status(404).json({
         error: "Streamer profile not found. Create a profile first from the frontend.",
