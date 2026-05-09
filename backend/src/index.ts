@@ -14,14 +14,15 @@ import trendingRouter from "./routes/trending";
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({ origin: process.env.FRONTEND_URL ?? "http://localhost:5173" }));
+app.use(express.json({ limit: "50kb" }));
 
 // x402 paywall — solo activo fuera de development
 if (process.env.NODE_ENV !== "development") {
-  const payTo = process.env.WALLET_ADDRESS ?? "";
+  const payTo = process.env.WALLET_ADDRESS;
   if (!payTo) {
-    console.warn("[x402] WALLET_ADDRESS no configurado — paywall desactivado");
+    console.error("[FATAL] WALLET_ADDRESS not set — refusing to start in production without paywall");
+    process.exit(1);
   } else {
     const facilitator = new HTTPFacilitatorClient({
       url: process.env.FACILITATOR_URL ?? "https://x402.org/facilitator",

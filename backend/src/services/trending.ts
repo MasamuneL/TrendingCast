@@ -58,7 +58,10 @@ const getTopGames = async (): Promise<TwitchGame[]> => {
 
   if (!res.ok) throw new Error(`Twitch games fetch failed: ${res.status}`);
 
-  const json = (await res.json()) as { data: TwitchGame[] };
+  const json = (await res.json()) as { data?: TwitchGame[] };
+  if (!Array.isArray(json.data)) {
+    throw new Error(`Unexpected Twitch response shape: missing data array`);
+  }
   _cache = { data: json.data, ts: Date.now() };
   return json.data;
 };
@@ -73,7 +76,8 @@ export const getTrendingForCategory = async (category: string): Promise<Trending
     const topics = games.slice(0, 3).map((g) => g.name);
     const fallback = FALLBACK_BY_CATEGORY[category] ?? FALLBACK_BY_CATEGORY.default;
     return { topics, peakHours: fallback.peakHours };
-  } catch {
+  } catch (err) {
+    console.error("[trending] Twitch API error, using fallback:", err);
     return FALLBACK_BY_CATEGORY[category] ?? FALLBACK_BY_CATEGORY.default;
   }
 };

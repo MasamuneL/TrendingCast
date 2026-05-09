@@ -11,7 +11,8 @@ const buildTemplateText = (topics: string[], bestHour: number): string => {
     : bestHour < 12 ? `${bestHour}am`
     : bestHour === 12 ? "12pm"
     : `${bestHour - 12}pm`;
-  return `Hoy a las ${hour12}: "${topics[0]}" está en tendencia — ¡únete al stream! 🔴`;
+  const firstTopic = topics[0] ?? "Trending Now";
+  return `Hoy a las ${hour12}: "${firstTopic}" está en tendencia — ¡únete al stream! 🔴`;
 };
 
 const pickBestHour = (preferredHours: number[], peakHours: number[]): number => {

@@ -78,13 +78,14 @@ function calcTier(score: number): Tier {
 }
 
 function repBarWidth(score: number, tier: Tier): number {
+  const safeScore = Math.max(0, score)
   const order: Tier[] = ['Bronze', 'Silver', 'Gold', 'Platinum']
   const idx  = order.indexOf(tier)
   const caps: Record<Tier, number> = { Bronze: 250, Silver: 500, Gold: 1000, Platinum: Infinity }
   const prev = idx === 0 ? 0 : caps[order[idx - 1]]
   const next = caps[tier]
   if (next === Infinity) return 100
-  return Math.min(100, ((score - prev) / (next - prev)) * 100)
+  return Math.min(100, Math.max(0, ((safeScore - prev) / (next - prev)) * 100))
 }
 
 function nextTierLabel(score: number, tier: Tier): string {
@@ -96,7 +97,9 @@ function nextTierLabel(score: number, tier: Tier): string {
 }
 
 function formatRelative(ts: number): string {
-  const diff = Date.now() - ts
+  // backend stores Unix seconds; convert to ms for comparison
+  const tsMs = ts < 1e12 ? ts * 1000 : ts
+  const diff = Math.max(0, Date.now() - tsMs)
   const mins = Math.floor(diff / 60000)
   if (mins < 60) return `hace ${mins}m`
   const hrs = Math.floor(mins / 60)

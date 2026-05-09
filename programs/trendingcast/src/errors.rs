@@ -22,4 +22,19 @@ pub enum TrendingCastError {
 
     #[msg("No autorizado para esta operación")]
     Unauthorized,
+
+    #[msg("Firma x402 inválida o excede longitud máxima (128 chars)")]
+    InvalidSignature,
+
+    #[msg("Topics inválidos: máx 3 items, cada uno máx 64 chars")]
+    InvalidTopics,
+
+    #[msg("Un streamer no puede comprarse su propio template")]
+    SelfPurchaseNotAllowed,
+
+    #[msg("El monto pagado no puede ser cero")]
+    InvalidAmount,
+
+    #[msg("Timestamp fuera de rango — debe ser positivo")]
+    InvalidTimestamp,
 }

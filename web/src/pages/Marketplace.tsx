@@ -45,8 +45,8 @@ async function buyTemplate(
   )
 
   if (anchorWallet) {
-    onStep('Firmando on-chain...')
-    await recordTemplateSaleOnChain(anchorWallet, {
+    onStep('Firmando transacción on-chain...')
+    const txSig = await recordTemplateSaleOnChain(anchorWallet, {
       templateId: receipt.templateId,
       buyer: new PublicKey(receipt.buyer),
       creator: new PublicKey(receipt.creator),
@@ -56,6 +56,7 @@ async function buyTemplate(
       category: template.category,
       priceLamports: template.price,
     })
+    return txSig  // actual Solana tx signature for explorer link
   }
 
   return receipt.receipt
@@ -121,7 +122,7 @@ function TemplateCard({
           {template.title}
         </p>
         <p className="text-[11px] text-[#8888a8] mb-3">
-          por <span className="text-[#4af7c4]">@{template.creator}</span>
+          por <span className="text-[#4af7c4]">@{template.displayName ?? template.creator.slice(0, 8) + '…'}</span>
         </p>
         <div className="flex items-center justify-between">
           <span className="font-mono text-[12px] font-bold text-[#f5c842]">
@@ -166,7 +167,7 @@ function PreviewPanel({
         <div className="text-4xl text-center mb-3">{template.emoji}</div>
         <p className="text-[15px] font-bold text-[#e8e8f0] mb-1">{template.title}</p>
         <p className="text-[11px] text-[#8888a8] mb-3">
-          {template.category} · @{template.creator}
+          {template.category} · @{template.displayName ?? template.creator.slice(0, 8) + '…'}
         </p>
         <div
           className="rounded-md p-3 mb-3 border-l-2 border-[#7c5cfc] text-[12px] leading-relaxed text-[#e8e8f0] font-mono"
@@ -256,6 +257,7 @@ export default function Marketplace() {
       if (sort === 'popular')    return b.totalSales - a.totalSales
       if (sort === 'price_asc')  return a.price - b.price
       if (sort === 'price_desc') return b.price - a.price
+      // 'recent' not sortable without createdAt — keep stable order
       return 0
     })
 
@@ -282,9 +284,11 @@ export default function Marketplace() {
 
     setBuying(true)
     try {
-      const receipt = await buyTemplate(selected, publicKey.toBase58(), anchorWallet, setBuyStep)
+      const txSig = await buyTemplate(selected, publicKey.toBase58(), anchorWallet, setBuyStep)
       setPurchased((prev) => new Set(prev).add(selected.id))
-      showToast(`Compra confirmada ✓ · ${receipt.slice(0, 8)}...`, 'success')
+      const explorerUrl = `https://explorer.solana.com/tx/${txSig}?cluster=devnet`
+      showToast(`Compra confirmada ✓ · explorer: ${txSig.slice(0, 8)}…`, 'success')
+      console.info('[buy] tx confirmed:', explorerUrl)
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'Error en el pago', 'error')
     } finally {

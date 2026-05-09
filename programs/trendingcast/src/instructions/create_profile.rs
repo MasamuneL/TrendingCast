@@ -21,7 +21,10 @@ pub struct CreateProfile<'info> {
 }
 
 pub fn handler(ctx: Context<CreateProfile>, category: String, hours: Vec<u8>) -> Result<()> {
-    require!(category.len() > 0 && category.len() <= 32, TrendingCastError::InvalidCategory);
+    require!(
+        category.len() > 0 && category.len() <= 32 && category.bytes().any(|b| b != b' '),
+        TrendingCastError::InvalidCategory
+    );
     require!(
         hours.len() <= MAX_HOURS_PER_PROFILE,
         TrendingCastError::InvalidHour

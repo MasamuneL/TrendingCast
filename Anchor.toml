@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-trendingcast = "CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD"
+trendingcast = "7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR"
 
 [provider]
 cluster = "devnet"
