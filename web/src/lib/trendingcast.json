@@ -1,0 +1,777 @@
+{
+  "address": "CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD",
+  "metadata": {
+    "name": "trendingcast",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "TrendingCast - marketplace descentralizado de templates para streamers",
+    "address": "CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD"
+  },
+  "instructions": [
+    {
+      "name": "calculate_reputation",
+      "discriminator": [
+        172,
+        112,
+        61,
+        123,
+        245,
+        2,
+        110,
+        226
+      ],
+      "accounts": [
+        {
+          "name": "reputation",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  112,
+                  117,
+                  116,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "streamer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "streamer"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_profile",
+      "discriminator": [
+        225,
+        205,
+        234,
+        143,
+        17,
+        186,
+        50,
+        220
+      ],
+      "accounts": [
+        {
+          "name": "profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "wallet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "wallet",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "category",
+          "type": "string"
+        },
+        {
+          "name": "hours",
+          "type": "bytes"
+        }
+      ]
+    },
+    {
+      "name": "distribute_rewards",
+      "discriminator": [
+        97,
+        6,
+        227,
+        255,
+        124,
+        165,
+        3,
+        148
+      ],
+      "accounts": [
+        {
+          "name": "reputation",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  112,
+                  117,
+                  116,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "streamer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "trend_mint",
+          "writable": true
+        },
+        {
+          "name": "streamer_ata",
+          "writable": true
+        },
+        {
+          "name": "mint_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  105,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "streamer",
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "record_template_sale",
+      "discriminator": [
+        133,
+        139,
+        60,
+        7,
+        206,
+        157,
+        234,
+        16
+      ],
+      "accounts": [
+        {
+          "name": "template",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  101,
+                  109,
+                  112,
+                  108,
+                  97,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              },
+              {
+                "kind": "arg",
+                "path": "template_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payment_receipt",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  97,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "buyer"
+              },
+              {
+                "kind": "account",
+                "path": "template"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator_reputation",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  112,
+                  117,
+                  116,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "creator"
+              }
+            ]
+          }
+        },
+        {
+          "name": "buyer_reputation",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  112,
+                  117,
+                  116,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "buyer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "buyer"
+        },
+        {
+          "name": "creator"
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "template_id",
+          "type": "u32"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "x402_tx_signature",
+          "type": "string"
+        },
+        {
+          "name": "content",
+          "type": "string"
+        },
+        {
+          "name": "category",
+          "type": "string"
+        },
+        {
+          "name": "price_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "save_recommendation",
+      "discriminator": [
+        174,
+        232,
+        217,
+        157,
+        195,
+        155,
+        109,
+        59
+      ],
+      "accounts": [
+        {
+          "name": "recommendation",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  99,
+                  111,
+                  109,
+                  109,
+                  101,
+                  110,
+                  100,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "streamer"
+              },
+              {
+                "kind": "arg",
+                "path": "timestamp"
+              }
+            ]
+          }
+        },
+        {
+          "name": "streamer"
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "timestamp",
+          "type": "i64"
+        },
+        {
+          "name": "topics",
+          "type": {
+            "vec": "string"
+          }
+        },
+        {
+          "name": "best_hour",
+          "type": "u8"
+        },
+        {
+          "name": "template_text",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Recommendation",
+      "discriminator": [
+        78,
+        139,
+        82,
+        88,
+        180,
+        64,
+        114,
+        185
+      ]
+    },
+    {
+      "name": "StreamTemplate",
+      "discriminator": [
+        217,
+        219,
+        186,
+        252,
+        167,
+        111,
+        7,
+        50
+      ]
+    },
+    {
+      "name": "StreamerProfile",
+      "discriminator": [
+        32,
+        107,
+        226,
+        99,
+        74,
+        246,
+        6,
+        99
+      ]
+    },
+    {
+      "name": "StreamerReputation",
+      "discriminator": [
+        137,
+        49,
+        144,
+        78,
+        237,
+        235,
+        49,
+        11
+      ]
+    },
+    {
+      "name": "X402PaymentReceipt",
+      "discriminator": [
+        240,
+        246,
+        44,
+        131,
+        97,
+        57,
+        144,
+        235
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "ReputationUpdated",
+      "discriminator": [
+        26,
+        36,
+        187,
+        150,
+        235,
+        90,
+        106,
+        89
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidCategory",
+      "msg": "Categor\u00eda de streamer inv\u00e1lida (m\u00e1x 32 chars)"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidHour",
+      "msg": "Hora inv\u00e1lida (debe ser 0-23, m\u00e1x 3 horas por perfil)"
+    },
+    {
+      "code": 6002,
+      "name": "TemplateContentTooLong",
+      "msg": "Contenido del template demasiado largo (m\u00e1x 256 chars)"
+    },
+    {
+      "code": 6003,
+      "name": "PriceTooLow",
+      "msg": "Precio demasiado bajo (m\u00ednimo 100_000 = $0.10 USDC)"
+    },
+    {
+      "code": 6004,
+      "name": "PaymentNotVerified",
+      "msg": "Pago no verificado por x402 \u2014 el backend debe validar antes de llamar esta instrucci\u00f3n"
+    },
+    {
+      "code": 6005,
+      "name": "ReputationOverflow",
+      "msg": "Overflow en c\u00e1lculo de reputaci\u00f3n"
+    },
+    {
+      "code": 6006,
+      "name": "Unauthorized",
+      "msg": "No autorizado para esta operaci\u00f3n"
+    }
+  ],
+  "types": [
+    {
+      "name": "Recommendation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "streamer",
+            "type": "pubkey"
+          },
+          {
+            "name": "topics",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "best_hour",
+            "type": "u8"
+          },
+          {
+            "name": "template_text",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ReputationUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "streamer",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_score",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StreamTemplate",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u32"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "content",
+            "type": "string"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "price_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "total_sales",
+            "type": "u32"
+          },
+          {
+            "name": "rating",
+            "type": "u8"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StreamerProfile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "category",
+            "type": "string"
+          },
+          {
+            "name": "hours",
+            "type": "bytes"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StreamerReputation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "streamer",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_sales",
+            "type": "u32"
+          },
+          {
+            "name": "total_purchases",
+            "type": "u32"
+          },
+          {
+            "name": "success_rate",
+            "type": "u8"
+          },
+          {
+            "name": "tokens_earned",
+            "type": "u64"
+          },
+          {
+            "name": "reputation_score",
+            "type": "u64"
+          },
+          {
+            "name": "last_updated",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "X402PaymentReceipt",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "buyer",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "template",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "x402_tx_signature",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "u8"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}
