@@ -1,23 +1,25 @@
 import { BN } from "@anchor-lang/core";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
-import { getProgram } from "../solana/client";
+import { getProgram, getWallet } from "../solana/client";
 import { findTemplatePDA, findPaymentPDA, findReputationPDA } from "../solana/pdas";
 
 interface RecordSaleParams {
   templateId: number;
   buyerWallet: string;
   creatorWallet: string;
-  amountUsdc: number;        // en unidades USDC con 6 decimales (ej: 100_000 = $0.10)
+  amountUsdc: number;        // monto pagado en USDC 6 decimales (ej: 100_000 = $0.10)
+  priceLamports: number;     // precio listado del template (puede diferir de amountUsdc)
   x402TxSignature: string;
   content: string;
   category: string;
 }
 
 export const recordSaleOnChain = async (params: RecordSaleParams) => {
-  const { templateId, buyerWallet, creatorWallet, amountUsdc, x402TxSignature, content, category } = params;
+  const { templateId, buyerWallet, creatorWallet, amountUsdc, priceLamports, x402TxSignature, content, category } = params;
 
   const program = getProgram();
   const methods = program.methods as any;
+  const authority = getWallet().publicKey;
   const buyer = new PublicKey(buyerWallet);
   const creator = new PublicKey(creatorWallet);
 
@@ -33,7 +35,7 @@ export const recordSaleOnChain = async (params: RecordSaleParams) => {
       x402TxSignature,
       content,
       category,
-      new BN(amountUsdc)
+      new BN(priceLamports)
     )
     .accounts({
       template: templatePDA,
@@ -42,6 +44,7 @@ export const recordSaleOnChain = async (params: RecordSaleParams) => {
       buyerReputation: buyerRepPDA,
       buyer,
       creator,
+      authority,
       systemProgram: SystemProgram.programId,
     } as any)
     .rpc();

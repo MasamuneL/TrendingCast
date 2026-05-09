@@ -1,6 +1,6 @@
 import { BN } from "@anchor-lang/core";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
-import { getProgram } from "../solana/client";
+import { getProgram, getWallet } from "../solana/client";
 import { findRecPDA, findProfilePDA } from "../solana/pdas";
 import { generateRecommendation } from "../services/recommender";
 
@@ -25,6 +25,8 @@ export const saveRecommendationOnChain = async (streamerWallet: string) => {
   const timestamp = Math.floor(Date.now() / 1000);
   const [recPDA] = findRecPDA(streamer, timestamp);
 
+  const authority = getWallet().publicKey;
+
   await methods
     .saveRecommendation(
       new BN(timestamp),
@@ -35,6 +37,7 @@ export const saveRecommendationOnChain = async (streamerWallet: string) => {
     .accounts({
       recommendation: recPDA,
       streamer,
+      authority,
       systemProgram: SystemProgram.programId,
     } as any)
     .rpc();

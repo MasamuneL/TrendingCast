@@ -79,7 +79,7 @@ cd web && npm run dev
 - **Faucets:** SOL → faucet.solana.com, USDC → faucet.circle.com
 ## Program ID
  
-Devnet: `CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD`
+Devnet: `7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR`
  
 Si cambia este Program ID, actualizar en:
 - `programs/trendingcast/src/lib.rs` (`declare_id!`)

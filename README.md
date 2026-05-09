@@ -31,7 +31,7 @@ TrendingCast gives every streamer a personalized, on-chain recommendation: which
 
 | Network | Program ID |
 |---------|-----------|
-| Solana Devnet | `CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD` |
+| Solana Devnet | `7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR` |
 
 USDC mint (devnet): `4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU` (Circle official)
 

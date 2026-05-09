@@ -7,15 +7,18 @@ use crate::state::Recommendation;
 pub struct SaveRecommendation<'info> {
     #[account(
         init,
-        payer = streamer,
+        payer = authority,
         space = 8 + Recommendation::INIT_SPACE,
         seeds = [REC_SEED, streamer.key().as_ref(), &timestamp.to_le_bytes()],
         bump,
     )]
     pub recommendation: Account<'info, Recommendation>,
 
+    /// CHECK: solo necesitamos la pubkey del streamer para derivar el PDA; el seed lo valida
+    pub streamer: UncheckedAccount<'info>,
+
     #[account(mut)]
-    pub streamer: Signer<'info>,
+    pub authority: Signer<'info>,
 
     pub system_program: Program<'info, System>,
 }

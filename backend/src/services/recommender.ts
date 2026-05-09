@@ -7,7 +7,10 @@ export interface Recommendation {
 }
 
 const buildTemplateText = (topics: string[], bestHour: number): string => {
-  const hour12 = bestHour > 12 ? `${bestHour - 12}pm` : `${bestHour}am`;
+  const hour12 = bestHour === 0 ? "12am"
+    : bestHour < 12 ? `${bestHour}am`
+    : bestHour === 12 ? "12pm"
+    : `${bestHour - 12}pm`;
   return `Hoy a las ${hour12}: "${topics[0]}" está en tendencia — ¡únete al stream! 🔴`;
 };
 

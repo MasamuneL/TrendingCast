@@ -23,10 +23,16 @@ let _tokenExpiry = 0;
 const getTwitchToken = async (): Promise<string> => {
   if (_twitchToken && Date.now() < _tokenExpiry) return _twitchToken;
 
-  const res = await fetch(
-    `https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`,
-    { method: "POST" }
-  );
+  const body = new URLSearchParams({
+    client_id: process.env.TWITCH_CLIENT_ID ?? "",
+    client_secret: process.env.TWITCH_CLIENT_SECRET ?? "",
+    grant_type: "client_credentials",
+  });
+  const res = await fetch("https://id.twitch.tv/oauth2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
 
   if (!res.ok) throw new Error(`Twitch auth failed: ${res.status}`);
 

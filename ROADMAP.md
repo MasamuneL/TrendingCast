@@ -7,7 +7,7 @@ Estado actual: smart contract deployado en devnet (7/8 tests passing). Backend y
 ## Completado
 
 - [x] Smart contract — 5 instrucciones implementadas (Anchor 1.0.2, Rust)
-- [x] Deploy a devnet — Program ID: `CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD`
+- [x] Deploy a devnet — Program ID: `7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR`
 - [x] Tests on-chain — 7 passing, 1 skip (`distribute_rewards` requiere mint TREND real)
 - [x] README con setup guide y deployment addresses
 

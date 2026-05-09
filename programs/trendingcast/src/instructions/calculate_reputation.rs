@@ -1,6 +1,5 @@
 use anchor_lang::prelude::*;
 use crate::constants::*;
-use crate::errors::TrendingCastError;
 use crate::state::StreamerReputation;
 
 #[event]
@@ -19,18 +18,12 @@ pub struct CalculateReputation<'info> {
     )]
     pub reputation: Account<'info, StreamerReputation>,
 
-    // Solo el propio streamer puede recalcular su reputación
-    pub streamer: Signer<'info>,
+    /// CHECK: el seed REPUTATION_SEED + streamer.key() ya vincula esta cuenta al streamer correcto
+    pub streamer: UncheckedAccount<'info>,
 }
 
 pub fn handler(ctx: Context<CalculateReputation>) -> Result<()> {
     let rep = &mut ctx.accounts.reputation;
-
-    // Doble check: la PDA ya garantiza esto, pero explicitamos la autorización
-    require!(
-        rep.streamer == ctx.accounts.streamer.key(),
-        TrendingCastError::Unauthorized
-    );
 
     // score = success_rate * total_sales + tokens_earned/1e9 + total_purchases * 2
     let score = (rep.success_rate as u64)

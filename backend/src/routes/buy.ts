@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import { PublicKey } from "@solana/web3.js";
 import { recordSaleOnChain } from "../handlers/recordSale";
 import { updateReputationOnChain } from "../handlers/updateReputation";
 
@@ -28,23 +29,39 @@ router.post("/:templateId", async (req: Request, res: Response) => {
     let amountUsdc = 100_000; // $0.10 default
 
     if (!bypassPayment && paymentHeader) {
-      const payment = JSON.parse(Buffer.from(paymentHeader, "base64").toString());
-      x402TxSignature = payment.signature ?? x402TxSignature;
-      buyerWallet = payment.payer ?? buyerWallet;
-      amountUsdc = payment.amount ?? amountUsdc;
+      try {
+        const payment = JSON.parse(Buffer.from(paymentHeader, "base64").toString());
+        x402TxSignature = payment.signature ?? x402TxSignature;
+        buyerWallet = payment.payer ?? buyerWallet;
+        amountUsdc = payment.amount ?? amountUsdc;
+      } catch {
+        res.status(402).json({ error: "Malformed payment header" });
+        return;
+      }
     }
 
-    const { creator, content, category } = req.body;
+    // validar que buyerWallet sea una pubkey válida
+    try {
+      new PublicKey(buyerWallet);
+    } catch {
+      res.status(400).json({ error: "Invalid buyer wallet address" });
+      return;
+    }
+
+    const { creator, content, category, price } = req.body;
     if (!buyerWallet || !creator || !content || !category) {
       res.status(400).json({ error: "Missing required fields: buyer, creator, content, category" });
       return;
     }
+    // precio listado del template; si no viene, usar lo que se pagó (demo fallback)
+    const priceLamports: number = typeof price === "number" ? price : amountUsdc;
 
     const result = await recordSaleOnChain({
       templateId,
       buyerWallet,
       creatorWallet: creator,
       amountUsdc,
+      priceLamports,
       x402TxSignature,
       content,
       category,
@@ -55,8 +72,8 @@ router.post("/:templateId", async (req: Request, res: Response) => {
     // recalcular reputación del creator post-venta
     try {
       await updateReputationOnChain(creator);
-    } catch {
-      // no bloquear la respuesta si falla el recálculo
+    } catch (err: any) {
+      console.error("[buy] reputation update failed for %s: %s", creator, err.message);
     }
 
     res.json({ receipt: result.paymentPDA, template: result.templatePDA });
