@@ -45,8 +45,8 @@ async function buyTemplate(
   )
 
   if (anchorWallet) {
-    onStep('Firmando on-chain...')
-    await recordTemplateSaleOnChain(anchorWallet, {
+    onStep('Firmando transacción on-chain...')
+    const txSig = await recordTemplateSaleOnChain(anchorWallet, {
       templateId: receipt.templateId,
       buyer: new PublicKey(receipt.buyer),
       creator: new PublicKey(receipt.creator),
@@ -56,6 +56,7 @@ async function buyTemplate(
       category: template.category,
       priceLamports: template.price,
     })
+    return txSig  // actual Solana tx signature for explorer link
   }
 
   return receipt.receipt
@@ -283,9 +284,11 @@ export default function Marketplace() {
 
     setBuying(true)
     try {
-      const receipt = await buyTemplate(selected, publicKey.toBase58(), anchorWallet, setBuyStep)
+      const txSig = await buyTemplate(selected, publicKey.toBase58(), anchorWallet, setBuyStep)
       setPurchased((prev) => new Set(prev).add(selected.id))
-      showToast(`Compra confirmada ✓ · ${receipt.slice(0, 8)}...`, 'success')
+      const explorerUrl = `https://explorer.solana.com/tx/${txSig}?cluster=devnet`
+      showToast(`Compra confirmada ✓ · explorer: ${txSig.slice(0, 8)}…`, 'success')
+      console.info('[buy] tx confirmed:', explorerUrl)
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'Error en el pago', 'error')
     } finally {

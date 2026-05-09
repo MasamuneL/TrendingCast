@@ -1,7 +1,7 @@
 import { AnchorProvider, Program, BN } from '@coral-xyz/anchor'
 import { Connection, PublicKey } from '@solana/web3.js'
 import type { AnchorWallet } from '@solana/wallet-adapter-react'
-import { SOLANA_RPC } from './constants'
+import { SOLANA_RPC, PROGRAM_ID } from './constants'
 import idl from './trendingcast.json'
 
 // FIXME: cast to any to avoid TS2589 (Anchor generic depth limit with inferred IDL types)
@@ -11,8 +11,10 @@ type AnyProgram = Program<any>
 function getProgram(wallet: AnchorWallet): AnyProgram {
   const connection = new Connection(SOLANA_RPC, 'confirmed')
   const provider = new AnchorProvider(connection, wallet, { commitment: 'confirmed' })
+  // Always use PROGRAM_ID from env — IDL address may be stale from a previous deploy
+  const patchedIdl = { ...idl, address: PROGRAM_ID.toBase58() }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return new (Program as any)(idl, provider)
+  return new (Program as any)(patchedIdl, provider)
 }
 
 // Anchor 0.30 new IDL format: accounts with "pda" or "address" are auto-resolved.
