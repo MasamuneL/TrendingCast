@@ -31,6 +31,8 @@ export const getProgram = (): AnyProgram => {
 
   const idlPath = path.resolve(__dirname, "../../../target/idl/trendingcast.json");
   const idl = JSON.parse(fs.readFileSync(idlPath, "utf-8"));
+  // target IDL may have the old program ID — override with the one from env
+  idl.address = process.env.TRENDINGCAST_PROGRAM_ID ?? "CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD";
 
   _program = new Program(idl, provider);
   return _program;

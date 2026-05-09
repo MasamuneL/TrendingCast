@@ -51,7 +51,7 @@ export class ProfileNotFoundError extends Error {
 }
 
 export async function fetchTrendingTopics(category?: string): Promise<TrendingTopic[]> {
-  const url = new URL(`${BACKEND_URL}/api/trending`)
+  const url = new URL(`${BACKEND_URL}/trending`)
   if (category) url.searchParams.set('category', category)
   const res = await fetch(url.toString())
   if (!res.ok) throw new Error(`Failed to fetch trending topics: ${res.statusText}`)

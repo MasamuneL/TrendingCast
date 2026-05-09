@@ -9,6 +9,7 @@ import recommendationsRouter from "./routes/recommendations";
 import templatesRouter from "./routes/templates";
 import buyRouter from "./routes/buy";
 import profilesRouter from "./routes/profiles";
+import trendingRouter from "./routes/trending";
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
@@ -49,6 +50,7 @@ if (process.env.NODE_ENV !== "development") {
 }
 
 app.use("/health", healthRouter);
+app.use("/trending", trendingRouter);
 app.use("/recommendations", recommendationsRouter);
 app.use("/templates", templatesRouter);
 app.use("/buy", buyRouter);

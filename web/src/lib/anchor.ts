@@ -1,5 +1,5 @@
 import { AnchorProvider, Program, BN } from '@coral-xyz/anchor'
-import { Connection, PublicKey, SystemProgram } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import type { AnchorWallet } from '@solana/wallet-adapter-react'
 import { SOLANA_RPC } from './constants'
 import idl from './trendingcast.json'
@@ -15,6 +15,9 @@ function getProgram(wallet: AnchorWallet): AnyProgram {
   return new (Program as any)(idl, provider)
 }
 
+// Anchor 0.30 new IDL format: accounts with "pda" or "address" are auto-resolved.
+// Only pass accounts that Anchor cannot derive on its own.
+
 export async function createProfileOnChain(
   wallet: AnchorWallet,
   category: string,
@@ -22,18 +25,10 @@ export async function createProfileOnChain(
 ): Promise<string> {
   const program = getProgram(wallet)
 
-  const [profilePDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('profile'), wallet.publicKey.toBuffer()],
-    program.programId,
-  )
-
+  // profile (PDA auto) and system_program (address auto) are resolved by Anchor
   const tx = await (program.methods as any)
-    .createProfile(category, hours)
-    .accounts({
-      profile: profilePDA,
-      wallet: wallet.publicKey,
-      systemProgram: SystemProgram.programId,
-    })
+    .createProfile(category, Buffer.from(hours))
+    .accounts({ wallet: wallet.publicKey })
     .rpc()
 
   return tx as string
@@ -47,18 +42,13 @@ export async function saveRecommendationOnChain(
   const program = getProgram(wallet)
   const ts = new BN(data.timestamp)
 
-  const [recommendationPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('recommendation'), streamer.toBuffer(), ts.toArrayLike(Buffer, 'le', 8)],
-    program.programId,
-  )
-
+  // recommendation (PDA auto from streamer+timestamp arg) and system_program (address auto)
+  // are resolved by Anchor — only pass the non-derivable accounts
   const tx = await (program.methods as any)
     .saveRecommendation(ts, data.topics, data.bestHour, data.templateText)
     .accounts({
-      recommendation: recommendationPDA,
       streamer,
       authority: wallet.publicKey,
-      systemProgram: SystemProgram.programId,
     })
     .rpc()
 
@@ -80,29 +70,8 @@ export async function recordTemplateSaleOnChain(
 ): Promise<string> {
   const program = getProgram(wallet)
 
-  const idBuf = Buffer.alloc(4)
-  idBuf.writeUInt32LE(args.templateId, 0)
-
-  const [templatePDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('template'), args.creator.toBuffer(), idBuf],
-    program.programId,
-  )
-
-  const [paymentReceiptPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('payment'), args.buyer.toBuffer(), templatePDA.toBuffer()],
-    program.programId,
-  )
-
-  const [creatorReputationPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('reputation'), args.creator.toBuffer()],
-    program.programId,
-  )
-
-  const [buyerReputationPDA] = PublicKey.findProgramAddressSync(
-    [Buffer.from('reputation'), args.buyer.toBuffer()],
-    program.programId,
-  )
-
+  // All PDAs (template, payment_receipt, creator_reputation, buyer_reputation) and
+  // system_program are auto-resolved by Anchor from buyer + creator + template_id arg
   const tx = await (program.methods as any)
     .recordTemplateSale(
       args.templateId,
@@ -113,14 +82,9 @@ export async function recordTemplateSaleOnChain(
       new BN(args.priceLamports),
     )
     .accounts({
-      template: templatePDA,
-      paymentReceipt: paymentReceiptPDA,
-      creatorReputation: creatorReputationPDA,
-      buyerReputation: buyerReputationPDA,
       buyer: args.buyer,
       creator: args.creator,
       authority: wallet.publicKey,
-      systemProgram: SystemProgram.programId,
     })
     .rpc()
 
