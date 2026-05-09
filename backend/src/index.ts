@@ -14,7 +14,10 @@ import trendingRouter from "./routes/trending";
 const app = express();
 const PORT = process.env.PORT ?? 3000;
 
-app.use(cors({ origin: process.env.FRONTEND_URL ?? "http://localhost:5173" }));
+const corsOrigin = process.env.NODE_ENV === "development"
+  ? (origin: string | undefined, cb: (e: Error | null, ok?: boolean) => void) => cb(null, true)
+  : (process.env.FRONTEND_URL ?? "http://localhost:5173");
+app.use(cors({ origin: corsOrigin }));
 app.use(express.json({ limit: "50kb" }));
 
 // x402 paywall — solo activo fuera de development
