@@ -256,6 +256,7 @@ export default function Marketplace() {
       if (sort === 'popular')    return b.totalSales - a.totalSales
       if (sort === 'price_asc')  return a.price - b.price
       if (sort === 'price_desc') return b.price - a.price
+      // 'recent' not sortable without createdAt — keep stable order
       return 0
     })
 

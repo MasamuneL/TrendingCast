@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import { useQuery } from '@tanstack/react-query'
 import ReputationBadge from '../components/ReputationBadge'
 import TrendingTopics from '../components/TrendingTopics'
 import { useRecommendation } from '../hooks/useRecommendation'
+import { BACKEND_URL } from '../lib/constants'
 
 const STREAMING_CATEGORIES = ['Gaming', 'IRL', 'Music', 'Art', 'Tech', 'Sports', 'Education']
 const STREAM_HOURS = [6, 9, 12, 15, 18, 20, 22]
@@ -95,7 +97,7 @@ function CreateProfileForm({ onSubmit, loading, error }: CreateProfileFormProps)
 
       <button
         onClick={() => onSubmit(category, selectedHours)}
-        disabled={!category || loading}
+        disabled={!category || selectedHours.length === 0 || loading}
         className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? 'Signing transaction…' : 'Create Profile'}
@@ -178,13 +180,25 @@ export default function Dashboard() {
 
   const walletStr = publicKey.toBase58()
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: profile } = useQuery<any>({
+    queryKey: ['profile', walletStr],
+    queryFn: () => fetch(`${BACKEND_URL}/profiles/${walletStr}`).then((r) => (r.ok ? r.json() : null)),
+    staleTime: 60_000,
+  })
+  const repScore = Math.max(0, parseInt(profile?.reputation?.reputationScore ?? '0') || 0)
+
   return (
     <div className="flex flex-col gap-8">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2">
           <RecommendationCard wallet={walletStr} />
         </div>
-        <ReputationBadge score={0} totalSales={0} totalPurchases={0} />
+        <ReputationBadge
+          score={repScore}
+          totalSales={profile?.reputation?.totalSales ?? 0}
+          totalPurchases={profile?.reputation?.totalPurchases ?? 0}
+        />
       </div>
 
       <div className="card">

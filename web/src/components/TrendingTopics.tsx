@@ -34,12 +34,19 @@ export default function TrendingTopics() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    setLoading(true)
-    setError(null)
-    fetchTrendingTopics(category === 'All' ? undefined : category)
-      .then(setTopics)
-      .catch((e: Error) => setError(e.message))
-      .finally(() => setLoading(false))
+    async function load() {
+      setLoading(true)
+      setError(null)
+      try {
+        const data = await fetchTrendingTopics(category === 'All' ? undefined : category)
+        setTopics(data)
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Unknown error loading topics')
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [category])
 
   return (

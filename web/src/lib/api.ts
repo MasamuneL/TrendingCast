@@ -103,7 +103,7 @@ function normalizeBadge(sales: number): 'hot' | 'top' | undefined {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function normalizeTemplate(t: any): StreamTemplate {
   const purchases = t.totalSales ?? t.purchases ?? 0
-  const price = parseInt(String(t.price)) || 0
+  const price = Math.max(0, Number(t.price) || 0)
   return {
     id: t.id,
     pubkey: t.pubkey,
