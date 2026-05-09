@@ -44,9 +44,17 @@ async function buyTemplate(
     template.category,
   )
 
+<<<<<<< Updated upstream
   if (anchorWallet) {
     onStep('Firmando transacción on-chain...')
     const txSig = await recordTemplateSaleOnChain(anchorWallet, {
+=======
+  const isValidPubkey = (s: string) => { try { new PublicKey(s); return true } catch { return false } }
+
+  if (anchorWallet && isValidPubkey(receipt.buyer) && isValidPubkey(receipt.creator)) {
+    onStep('Firmando on-chain...')
+    await recordTemplateSaleOnChain(anchorWallet, {
+>>>>>>> Stashed changes
       templateId: receipt.templateId,
       buyer: new PublicKey(receipt.buyer),
       creator: new PublicKey(receipt.creator),

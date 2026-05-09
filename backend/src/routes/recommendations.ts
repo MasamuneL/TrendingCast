@@ -58,7 +58,13 @@ router.post("/:wallet/generate", async (req: Request, res: Response) => {
     const result = await getRecommendationData(wallet.toBase58());
     res.json(result);
   } catch (err: any) {
-    if (err.message?.includes("Account does not exist") || err.message?.includes("has no data")) {
+    if (
+      err.message?.includes("Account does not exist") ||
+      err.message?.includes("has no data") ||
+      err.message?.includes("account not found") ||
+      err.code === 3012 ||
+      err.message?.includes("AnchorError")
+    ) {
       res.status(404).json({
         error: "Streamer profile not found. Create a profile first from the frontend.",
       });

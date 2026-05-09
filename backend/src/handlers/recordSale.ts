@@ -28,6 +28,12 @@ export const recordSaleOnChain = async (params: RecordSaleParams) => {
   const [creatorRepPDA] = findReputationPDA(creator);
   const [buyerRepPDA] = findReputationPDA(buyer);
 
+  const receiptAccount = await program.provider.connection.getAccountInfo(paymentPDA);
+  if (receiptAccount !== null) {
+    console.log("[recordSale] Receipt ya existe, skipping on-chain tx");
+    return { receipt: paymentPDA.toBase58(), alreadyOwned: true };
+  }
+
   await methods
     .recordTemplateSale(
       templateId,
