@@ -42,13 +42,22 @@ export async function saveRecommendationOnChain(
   const program = getProgram(wallet)
   const ts = new BN(data.timestamp)
 
-  // recommendation (PDA auto from streamer+timestamp arg) and system_program (address auto)
-  // are resolved by Anchor — only pass the non-derivable accounts
+  // Anchor 0.30.1 cannot auto-resolve PDAs with kind:"arg" seeds — derive manually.
+  // recommendation seed: ["recommendation", streamer, timestamp (i64 LE)]
+  const tsBuf = Buffer.alloc(8)
+  tsBuf.writeBigInt64LE(BigInt(data.timestamp), 0)
+  const [recPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('recommendation'), streamer.toBuffer(), tsBuf],
+    program.programId,
+  )
+
   const tx = await (program.methods as any)
     .saveRecommendation(ts, data.topics, data.bestHour, data.templateText)
     .accounts({
+      recommendation: recPDA,
       streamer,
       authority: wallet.publicKey,
+      // system_program auto-resolved from address field
     })
     .rpc()
 
@@ -70,8 +79,20 @@ export async function recordTemplateSaleOnChain(
 ): Promise<string> {
   const program = getProgram(wallet)
 
-  // All PDAs (template, payment_receipt, creator_reputation, buyer_reputation) and
-  // system_program are auto-resolved by Anchor from buyer + creator + template_id arg
+  // template PDA has kind:"arg" seed (template_id u32 LE) — derive manually.
+  // payment_receipt depends on the derived template PDA — also derive manually.
+  // creator_reputation and buyer_reputation only have const+account seeds — auto-resolved.
+  const idBuf = Buffer.alloc(4)
+  idBuf.writeUInt32LE(args.templateId, 0)
+  const [templatePDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('template'), args.creator.toBuffer(), idBuf],
+    program.programId,
+  )
+  const [paymentReceiptPDA] = PublicKey.findProgramAddressSync(
+    [Buffer.from('payment'), args.buyer.toBuffer(), templatePDA.toBuffer()],
+    program.programId,
+  )
+
   const tx = await (program.methods as any)
     .recordTemplateSale(
       args.templateId,
@@ -82,9 +103,13 @@ export async function recordTemplateSaleOnChain(
       new BN(args.priceLamports),
     )
     .accounts({
+      template: templatePDA,
+      paymentReceipt: paymentReceiptPDA,
       buyer: args.buyer,
       creator: args.creator,
       authority: wallet.publicKey,
+      // creatorReputation, buyerReputation: auto (const+account seeds)
+      // systemProgram: auto (address field)
     })
     .rpc()
 

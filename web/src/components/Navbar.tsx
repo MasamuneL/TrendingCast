@@ -4,6 +4,7 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 const links = [
   { to: '/', label: 'Dashboard' },
   { to: '/marketplace', label: 'Marketplace' },
+  { to: '/profile', label: 'Profile' },
 ]
 
 export default function Navbar() {
