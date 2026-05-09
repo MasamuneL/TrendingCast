@@ -18,7 +18,9 @@
     "buffer": "^6.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.0"
+    "@tanstack/react-query": "^5.100.9",
+    "react-router-dom": "^6.28.0",
+    "x402-fetch": "^1.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
