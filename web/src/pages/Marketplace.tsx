@@ -121,7 +121,7 @@ function TemplateCard({
           {template.title}
         </p>
         <p className="text-[11px] text-[#8888a8] mb-3">
-          por <span className="text-[#4af7c4]">@{template.creator}</span>
+          por <span className="text-[#4af7c4]">@{template.displayName ?? template.creator.slice(0, 8) + '…'}</span>
         </p>
         <div className="flex items-center justify-between">
           <span className="font-mono text-[12px] font-bold text-[#f5c842]">
@@ -166,7 +166,7 @@ function PreviewPanel({
         <div className="text-4xl text-center mb-3">{template.emoji}</div>
         <p className="text-[15px] font-bold text-[#e8e8f0] mb-1">{template.title}</p>
         <p className="text-[11px] text-[#8888a8] mb-3">
-          {template.category} · @{template.creator}
+          {template.category} · @{template.displayName ?? template.creator.slice(0, 8) + '…'}
         </p>
         <div
           className="rounded-md p-3 mb-3 border-l-2 border-[#7c5cfc] text-[12px] leading-relaxed text-[#e8e8f0] font-mono"

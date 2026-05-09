@@ -17,7 +17,10 @@ export interface StreamTemplate {
   title: string
   content: string
   tier: 'cheap' | 'premium'
+  /** Valid Solana base58 pubkey — used for on-chain tx */
   creator: string
+  /** Human-readable creator name for display only */
+  displayName?: string
   /** Precio en lamports de USDC (100_000 = $0.10) */
   price: number
   purchases: number
@@ -58,6 +61,14 @@ export class ProfileNotFoundError extends Error {
 
 // ─── Mock data ─────────────────────────────────────────────────────────────────
 
+// Valid devnet pubkeys used as creator addresses in mock data.
+// Mock templates are only shown when backend is unreachable.
+const DEMO_PK = {
+  A: '7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR',
+  B: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
+  C: 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJe1bJ',
+} as const
+
 const MOCK_TOPICS: TrendingTopic[] = [
   { id: 't1', title: 'Minecraft Speedrun',     score: 982, bestStreamHour: 21, tags: ['Minecraft', 'Speedrun', 'PB'],    category: 'Gaming' },
   { id: 't2', title: 'Valorant Ranked Climb',  score: 874, bestStreamHour: 20, tags: ['Valorant', 'Ranked', 'FPS'],      category: 'Gaming' },
@@ -70,14 +81,14 @@ const MOCK_TOPICS: TrendingTopic[] = [
 ]
 
 const MOCK_TEMPLATES: StreamTemplate[] = [
-  { id: 1, emoji: '🎮', category: 'Gaming',        title: 'Raid de medianoche',    creator: 'xNachtStreamer', content: '¡RAID INCOMING! Llevo a {viewers} viewers a {target} — hoy jugamos {game} sin parar.', price: 500_000, totalSales: 342, purchases: 342, tier: 'premium', badge: 'hot' },
-  { id: 2, emoji: '⚡', category: 'Gaming',        title: 'Speedrun hype opener',  creator: 'VelozGG',        content: '[SPEEDRUN EN VIVO] {game} — WR: {wr}. Hoy lo bajamos. Cada death = {penalty}.', price: 250_000, totalSales: 198, purchases: 198, tier: 'cheap', badge: 'top' },
-  { id: 3, emoji: '🎵', category: 'Music',         title: 'Sesión nocturna lo-fi', creator: 'LofiLuna',       content: 'Noche de beats ✦ {hours}h continuas · Sin interrupciones · Solo {viewers} almas aquí.', price: 750_000, totalSales: 89, purchases: 89, tier: 'premium', badge: 'new' },
-  { id: 4, emoji: '💬', category: 'Just Chatting', title: 'Debate semanal',        creator: 'CharlaMX',       content: '🔥 TEMA: {topic} · ¿Acuerdo? Vota en !poll — ganador elige el próximo tema.', price: 300_000, totalSales: 421, purchases: 421, tier: 'cheap', badge: 'top' },
-  { id: 5, emoji: '🌎', category: 'IRL',           title: 'Tour callejero en vivo',creator: 'UrbanWalker',    content: 'IRL desde {city} · siguiendo al chat · {km}km recorridos · Próximo: vota en !dest.', price: 1_000_000, totalSales: 67, purchases: 67, tier: 'premium' },
-  { id: 6, emoji: '🃏', category: 'Variety',       title: 'Ruleta de juegos',      creator: 'WheelOfGames',   content: 'LA RULETA MANDA · Gira = nuevo juego · Actual: {game} · Próxima en {time}min', price: 500_000, totalSales: 156, purchases: 156, tier: 'premium', badge: 'hot' },
-  { id: 7, emoji: '🏆', category: 'Gaming',        title: 'Torneo interno viewers',creator: 'xNachtStreamer',  content: 'TORNEO 1v1 · {viewers} registrados · Bracket en pantalla · Siguiente: {p1} vs {p2}', price: 400_000, totalSales: 234, purchases: 234, tier: 'cheap' },
-  { id: 8, emoji: '🎤', category: 'Just Chatting', title: 'Karaoke de clip voting',creator: 'VoxPop',         content: 'KARAOKE VOTING · Los viewers eligen qué canto · Clip más votado gana.', price: 200_000, totalSales: 310, purchases: 310, tier: 'cheap', badge: 'new' },
+  { id: 1, emoji: '🎮', category: 'Gaming',        title: 'Raid de medianoche',    creator: DEMO_PK.A, displayName: 'xNachtStreamer', content: '¡RAID INCOMING! Llevo a {viewers} viewers a {target} — hoy jugamos {game} sin parar.', price: 500_000, totalSales: 342, purchases: 342, tier: 'premium', badge: 'hot' },
+  { id: 2, emoji: '⚡', category: 'Gaming',        title: 'Speedrun hype opener',  creator: DEMO_PK.B, displayName: 'VelozGG',        content: '[SPEEDRUN EN VIVO] {game} — WR: {wr}. Hoy lo bajamos. Cada death = {penalty}.', price: 250_000, totalSales: 198, purchases: 198, tier: 'cheap', badge: 'top' },
+  { id: 3, emoji: '🎵', category: 'Music',         title: 'Sesión nocturna lo-fi', creator: DEMO_PK.C, displayName: 'LofiLuna',       content: 'Noche de beats ✦ {hours}h continuas · Sin interrupciones · Solo {viewers} almas aquí.', price: 750_000, totalSales: 89, purchases: 89, tier: 'premium', badge: 'new' },
+  { id: 4, emoji: '💬', category: 'Just Chatting', title: 'Debate semanal',        creator: DEMO_PK.A, displayName: 'CharlaMX',       content: '🔥 TEMA: {topic} · ¿Acuerdo? Vota en !poll — ganador elige el próximo tema.', price: 300_000, totalSales: 421, purchases: 421, tier: 'cheap', badge: 'top' },
+  { id: 5, emoji: '🌎', category: 'IRL',           title: 'Tour callejero en vivo', creator: DEMO_PK.B, displayName: 'UrbanWalker',   content: 'IRL desde {city} · siguiendo al chat · {km}km recorridos · Próximo: vota en !dest.', price: 1_000_000, totalSales: 67, purchases: 67, tier: 'premium' },
+  { id: 6, emoji: '🃏', category: 'Variety',       title: 'Ruleta de juegos',      creator: DEMO_PK.C, displayName: 'WheelOfGames',   content: 'LA RULETA MANDA · Gira = nuevo juego · Actual: {game} · Próxima en {time}min', price: 500_000, totalSales: 156, purchases: 156, tier: 'premium', badge: 'hot' },
+  { id: 7, emoji: '🏆', category: 'Gaming',        title: 'Torneo interno viewers', creator: DEMO_PK.A, displayName: 'xNachtStreamer',  content: 'TORNEO 1v1 · {viewers} registrados · Bracket en pantalla · Siguiente: {p1} vs {p2}', price: 400_000, totalSales: 234, purchases: 234, tier: 'cheap' },
+  { id: 8, emoji: '🎤', category: 'Just Chatting', title: 'Karaoke de clip voting', creator: DEMO_PK.B, displayName: 'VoxPop',         content: 'KARAOKE VOTING · Los viewers eligen qué canto · Clip más votado gana.', price: 200_000, totalSales: 310, purchases: 310, tier: 'cheap', badge: 'new' },
 ]
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -111,6 +122,7 @@ function normalizeTemplate(t: any): StreamTemplate {
     content: t.content,
     tier: t.tier ?? (price <= 100_000 ? 'cheap' : 'premium'),
     creator: t.creator,
+    displayName: t.displayName,
     price,
     purchases,
     totalSales: purchases,
