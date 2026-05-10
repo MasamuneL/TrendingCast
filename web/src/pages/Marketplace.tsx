@@ -26,6 +26,14 @@ function fmtPrice(lamports: number): string {
   return (lamports / 1_000_000).toFixed(2)
 }
 
+function safePublicKey(address: string, label: string): PublicKey {
+  try {
+    return new PublicKey(address)
+  } catch {
+    throw new Error(`Dirección inválida (${label}): "${address}"`)
+  }
+}
+
 // ─── Buy flow (signer = AnchorWallet del usuario) ─────────────────────────────
 
 async function buyTemplate(
@@ -48,8 +56,8 @@ async function buyTemplate(
     onStep('Firmando transacción on-chain...')
     const txSig = await recordTemplateSaleOnChain(anchorWallet, {
       templateId: receipt.templateId,
-      buyer: new PublicKey(receipt.buyer),
-      creator: new PublicKey(receipt.creator),
+      buyer: safePublicKey(receipt.buyer, 'buyer'),
+      creator: safePublicKey(receipt.creator, 'creator'),
       amountUsdc: receipt.amountUsdc || template.price,
       x402TxSignature: receipt.receipt,
       content: template.content,
