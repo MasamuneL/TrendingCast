@@ -12,7 +12,7 @@ pub use state::*;
 declare_id!("7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR");
 
 #[program]
-pub mod trendingcast {
+pub mod trendsurge {
     use super::*;
 
     pub fn create_profile(

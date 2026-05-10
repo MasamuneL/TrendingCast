@@ -1,4 +1,4 @@
-# TrendingCast Backend API
+# TrendSurge Backend API
 
 Base URL (dev): `http://localhost:3000`
 

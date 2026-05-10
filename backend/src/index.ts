@@ -61,5 +61,5 @@ app.use("/buy", buyRouter);
 app.use("/profiles", profilesRouter);
 
 app.listen(PORT, () => {
-  console.log(`TrendingCast backend running on port ${PORT} [${process.env.NODE_ENV}]`);
+  console.log(`TrendSurge backend running on port ${PORT} [${process.env.NODE_ENV}]`);
 });

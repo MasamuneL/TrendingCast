@@ -1,4 +1,4 @@
-# TrendingCast — Sprints del Hackathon
+# TrendSurge — Sprints del Hackathon
 
 > Entrega: domingo al mediodía.
 > Regla general: hoy código, mañana demo. Cero features nuevas el día de entrega.
@@ -125,7 +125,7 @@ Carril D ──construye UI────── Marketplace + buy flow
 
 ```env
 # backend/.env
-TRENDINGCAST_PROGRAM_ID=7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR
+TrendSurge_PROGRAM_ID=7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR
 RPC_URL=https://api.devnet.solana.com
 FACILITATOR_URL=https://x402.org/facilitator
 USDC_MINT=4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU
@@ -134,7 +134,7 @@ TWITCH_CLIENT_SECRET=<obtener en dev.twitch.tv>
 NODE_ENV=development
 
 # web/.env
-VITE_TRENDINGCAST_PROGRAM_ID=7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR
+VITE_TrendSurge_PROGRAM_ID=7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR
 VITE_BACKEND_URL=http://localhost:3000
 ```
 

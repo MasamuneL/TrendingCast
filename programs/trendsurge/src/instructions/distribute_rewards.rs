@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount};
 use crate::constants::*;
-use crate::errors::TrendingCastError;
+use crate::errors::TrendSurgeError;
 use crate::state::StreamerReputation;
 
 #[derive(Accounts)]
@@ -38,7 +38,7 @@ pub struct DistributeRewards<'info> {
 pub fn handler(ctx: Context<DistributeRewards>) -> Result<()> {
     require!(
         ctx.accounts.reputation.streamer == ctx.accounts.streamer.key(),
-        TrendingCastError::Unauthorized
+        TrendSurgeError::Unauthorized
     );
 
     let mint_auth_bump = ctx.bumps.mint_authority;

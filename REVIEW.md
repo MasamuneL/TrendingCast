@@ -1,4 +1,4 @@
-# TrendingCast Backend — Code Review
+# TrendSurge Backend — Code Review
 
 **Reviewed:** 2026-05-08T00:00:00Z
 **Depth:** deep (cross-file, Rust ↔ TypeScript boundary verification)
@@ -106,7 +106,7 @@ await methods
   .rpc();
 ```
 
-Here `streamer` is a `PublicKey` object, not a `Signer`. When `.rpc()` is called, Anchor signs the transaction with the backend wallet (from `getProgram()`). On-chain, `ctx.accounts.streamer` will be the backend wallet's pubkey. The `require!(rep.streamer == ctx.accounts.streamer.key(), ...)` check will always fail for any wallet that is not the backend wallet, returning `TrendingCastError::Unauthorized`. Every post-sale reputation update call in `buy.ts:56-58` silently swallows this error in an empty catch block, hiding the failure completely.
+Here `streamer` is a `PublicKey` object, not a `Signer`. When `.rpc()` is called, Anchor signs the transaction with the backend wallet (from `getProgram()`). On-chain, `ctx.accounts.streamer` will be the backend wallet's pubkey. The `require!(rep.streamer == ctx.accounts.streamer.key(), ...)` check will always fail for any wallet that is not the backend wallet, returning `TrendSurgeError::Unauthorized`. Every post-sale reputation update call in `buy.ts:56-58` silently swallows this error in an empty catch block, hiding the failure completely.
 
 **Fix (option A — architectural):** Change the Rust `CalculateReputation` instruction to accept an `authority` account that the backend can sign, rather than requiring the streamer themselves. This is appropriate because reputation recalculation is triggered by backend business logic, not by the streamer directly.
 
@@ -385,7 +385,7 @@ const hour12 =
 
 ```typescript
 export const PROGRAM_ID = new PublicKey(
-  process.env.TRENDINGCAST_PROGRAM_ID ?? "7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR"
+  process.env.TrendSurge_PROGRAM_ID ?? "7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR"
 );
 ```
 
@@ -393,10 +393,10 @@ The `constants.rs` rule and project conventions say to never hardcode the Progra
 
 **Fix:** Throw at module load if the env var is missing:
 ```typescript
-if (!process.env.TRENDINGCAST_PROGRAM_ID) {
-  throw new Error("TRENDINGCAST_PROGRAM_ID env var is required");
+if (!process.env.TrendSurge_PROGRAM_ID) {
+  throw new Error("TrendSurge_PROGRAM_ID env var is required");
 }
-export const PROGRAM_ID = new PublicKey(process.env.TRENDINGCAST_PROGRAM_ID);
+export const PROGRAM_ID = new PublicKey(process.env.TrendSurge_PROGRAM_ID);
 ```
 
 ---

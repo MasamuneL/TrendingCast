@@ -15,7 +15,7 @@ function ConnectPrompt() {
   return (
     <div className="card text-center py-12 flex flex-col items-center gap-4 max-w-md mx-auto">
       <div className="text-4xl">📡</div>
-      <h2 className="text-xl font-bold">Welcome to TrendingCast</h2>
+      <h2 className="text-xl font-bold">Welcome to TrendSurge</h2>
       <p className="text-gray-400 text-sm">
         Connect your Solana wallet to get personalized streaming recommendations and access the
         template marketplace.

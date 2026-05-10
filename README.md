@@ -1,6 +1,6 @@
-# TrendingCast
+# TrendSurge
 
-AI-powered trending topic recommendation system for emerging streamers — built on Solana. TrendingCast analyzes what's trending across platforms and delivers personalized content recommendations on-chain, so streamers know exactly what to stream, when, and with what template.
+AI-powered trending topic recommendation system for emerging streamers — built on Solana. TrendSurge analyzes what's trending across platforms and delivers personalized content recommendations on-chain, so streamers know exactly what to stream, when, and with what template.
 
 As a plus, streamers can buy and sell content templates (CTAs, stream openers, hooks) using USDC micropayments via the [x402 protocol](https://x402.org), with reputation calculated entirely on-chain.
 
@@ -14,7 +14,7 @@ Emerging streamers don't know what to stream. They pick topics too late, miss tr
 
 ## The Solution
 
-TrendingCast gives every streamer a personalized, on-chain recommendation: which topics are trending in their category, the best hour to go live today, and a ready-to-use content template — all verifiable and immutable on Solana devnet.
+TrendSurge gives every streamer a personalized, on-chain recommendation: which topics are trending in their category, the best hour to go live today, and a ready-to-use content template — all verifiable and immutable on Solana devnet.
 
 ---
 
@@ -78,8 +78,8 @@ x402 facilitator: `https://x402.org/facilitator`
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/MasamuneL/TrendingCast.git
-cd TrendingCast
+git clone https://github.com/MasamuneL/TrendSurge.git
+cd TrendSurge
 npm install
 ```
 
@@ -102,7 +102,7 @@ anchor build
 > ```bash
 > anchor keys sync
 > ```
-> Then update `declare_id!` in `programs/trendingcast/src/lib.rs` and `Anchor.toml`.
+> Then update `declare_id!` in `programs/trendsurge/src/lib.rs` and `Anchor.toml`.
 
 ### 4. Deploy to devnet
 
@@ -122,7 +122,7 @@ Expected output: **7 passing, 1 pending** (distribute_rewards skipped — requir
 
 ```bash
 cd backend
-cp .env.example .env   # fill in TRENDINGCAST_PROGRAM_ID and FACILITATOR_URL
+cp .env.example .env   # fill in TRENDSURGE_PROGRAM_ID and FACILITATOR_URL
 npm install
 npm run dev
 ```
@@ -131,7 +131,7 @@ npm run dev
 
 ```bash
 cd web
-cp .env.example .env   # fill in VITE_TRENDINGCAST_PROGRAM_ID
+cp .env.example .env   # fill in VITE_TRENDSURGE_PROGRAM_ID
 npm install
 npm run dev
 ```

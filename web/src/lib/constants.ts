@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
 
-const rawProgramId = import.meta.env.VITE_TRENDINGCAST_PROGRAM_ID
-if (!rawProgramId) throw new Error('VITE_TRENDINGCAST_PROGRAM_ID is not set')
+const rawProgramId = import.meta.env.VITE_TRENDSURGE_PROGRAM_ID
+if (!rawProgramId) throw new Error('VITE_TRENDSURGE_PROGRAM_ID is not set')
 export const PROGRAM_ID = new PublicKey(rawProgramId)
 
 // Circle USDC devnet mint

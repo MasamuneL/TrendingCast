@@ -1,12 +1,12 @@
 [package]
-name = "trendingcast"
+name = "trendsurge"
 version = "0.1.0"
-description = "TrendingCast - marketplace descentralizado de templates para streamers"
+description = "TrendSurge - marketplace descentralizado de templates para streamers"
 edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "trendingcast"
+name = "trendsurge"
 
 [features]
 default = []

@@ -16,7 +16,7 @@ export default function App() {
         </Routes>
       </main>
       <footer className="border-t border-gray-800 py-4 text-center text-gray-500 text-sm">
-        TrendingCast — Built on Solana devnet
+        TrendSurge — Built on Solana devnet
       </footer>
     </div>
   )

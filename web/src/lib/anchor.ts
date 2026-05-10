@@ -2,7 +2,7 @@ import { AnchorProvider, Program, BN } from '@coral-xyz/anchor'
 import { Connection, PublicKey } from '@solana/web3.js'
 import type { AnchorWallet } from '@solana/wallet-adapter-react'
 import { SOLANA_RPC, PROGRAM_ID } from './constants'
-import idl from './trendingcast.json'
+import idl from './trendsurge.json'
 
 // FIXME: cast to any to avoid TS2589 (Anchor generic depth limit with inferred IDL types)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

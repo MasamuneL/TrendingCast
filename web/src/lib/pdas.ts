@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
 import { PROGRAM_ID } from './constants'
 
-// Seeds must match programs/trendingcast/src/constants.rs exactly
+// Seeds must match programs/trendsurge/src/constants.rs exactly
 
 export function getStreamerProfilePDA(wallet: PublicKey): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(

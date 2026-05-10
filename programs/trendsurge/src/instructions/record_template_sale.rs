@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::constants::*;
-use crate::errors::TrendingCastError;
+use crate::errors::TrendSurgeError;
 use crate::state::{StreamTemplate, StreamerReputation, X402PaymentReceipt};
 
 #[derive(Accounts)]
@@ -71,13 +71,13 @@ pub fn handler(
     // Esta instrucción solo registra — el USDC ya fue movido por el facilitator.
     require!(
         ctx.accounts.buyer.key() != ctx.accounts.creator.key(),
-        TrendingCastError::SelfPurchaseNotAllowed
+        TrendSurgeError::SelfPurchaseNotAllowed
     );
-    require!(price_lamports >= MIN_TEMPLATE_PRICE, TrendingCastError::PriceTooLow);
-    require!(amount > 0, TrendingCastError::InvalidAmount);
-    require!(x402_tx_signature.len() <= 128, TrendingCastError::InvalidSignature);
-    require!(content.len() <= 256, TrendingCastError::TemplateContentTooLong);
-    require!(category.len() <= 32, TrendingCastError::InvalidCategory);
+    require!(price_lamports >= MIN_TEMPLATE_PRICE, TrendSurgeError::PriceTooLow);
+    require!(amount > 0, TrendSurgeError::InvalidAmount);
+    require!(x402_tx_signature.len() <= 128, TrendSurgeError::InvalidSignature);
+    require!(content.len() <= 256, TrendSurgeError::TemplateContentTooLong);
+    require!(category.len() <= 32, TrendSurgeError::InvalidCategory);
 
     let clock = Clock::get()?;
 

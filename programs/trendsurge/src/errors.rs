@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[error_code]
-pub enum TrendingCastError {
+pub enum TrendSurgeError {
     #[msg("Categoría de streamer inválida (máx 32 chars)")]
     InvalidCategory,
 

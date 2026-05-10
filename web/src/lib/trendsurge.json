@@ -1,10 +1,10 @@
 {
   "address": "7us4TNvEtKYiq55ZKfAPztkCei8PpjwLsyCtuCLBAJaR",
   "metadata": {
-    "name": "trendingcast",
+    "name": "trendsurge",
     "version": "0.1.0",
     "spec": "0.1.0",
-    "description": "TrendingCast - marketplace descentralizado de templates para streamers",
+    "description": "TrendSurge - marketplace descentralizado de templates para streamers",
     "address": "CewXVE956fdWcnTCZYHRtfFDdueG66fGLLoedSUMwffD"
   },
   "instructions": [

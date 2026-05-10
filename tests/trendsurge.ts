@@ -2,13 +2,13 @@ import * as anchor from "@anchor-lang/core";
 import { Program, BN } from "@anchor-lang/core";
 import { PublicKey, Keypair, SystemProgram } from "@solana/web3.js";
 import { assert } from "chai";
-import { Trendingcast } from "../target/types/trendingcast";
+import { Trendsurge } from "../target/types/trendsurge";
 
-describe("trendingcast", () => {
+describe("trendsurge", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.Trendingcast as Program<Trendingcast>;
+  const program = anchor.workspace.Trendsurge as Program<Trendsurge>;
 
   const PROFILE_SEED = Buffer.from("profile");
   const REPUTATION_SEED = Buffer.from("reputation");

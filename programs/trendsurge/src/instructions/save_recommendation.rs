@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::constants::*;
-use crate::errors::TrendingCastError;
+use crate::errors::TrendSurgeError;
 use crate::state::Recommendation;
 
 #[derive(Accounts)]
@@ -31,13 +31,13 @@ pub fn handler(
     best_hour: u8,
     template_text: String,
 ) -> Result<()> {
-    require!(timestamp > 0, TrendingCastError::InvalidTimestamp);
-    require!(best_hour < 24, TrendingCastError::InvalidHour);
-    require!(topics.len() <= 3, TrendingCastError::InvalidTopics);
+    require!(timestamp > 0, TrendSurgeError::InvalidTimestamp);
+    require!(best_hour < 24, TrendSurgeError::InvalidHour);
+    require!(topics.len() <= 3, TrendSurgeError::InvalidTopics);
     for t in &topics {
-        require!(t.len() <= 64, TrendingCastError::InvalidTopics);
+        require!(t.len() <= 64, TrendSurgeError::InvalidTopics);
     }
-    require!(template_text.len() <= 256, TrendingCastError::TemplateContentTooLong);
+    require!(template_text.len() <= 256, TrendSurgeError::TemplateContentTooLong);
 
     let rec = &mut ctx.accounts.recommendation;
     rec.streamer = ctx.accounts.streamer.key();

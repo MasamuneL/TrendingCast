@@ -1,4 +1,4 @@
-# TrendingCast — Roadmap
+# TrendSurge — Roadmap
 
 Estado actual: smart contract deployado en devnet (7/8 tests passing). Backend y frontend pendientes.
 
@@ -38,7 +38,7 @@ Estado actual: smart contract deployado en devnet (7/8 tests passing). Backend y
 | Ruta pública: listar templates | `backend/src/routes/templates.ts` | GET `/templates` — sin paywall |
 | Ruta paywalled: comprar template | `backend/src/routes/buy.ts` | POST `/buy/:templateId` — con middleware x402 |
 | Endpoint de health | `backend/src/routes/health.ts` | GET `/health` — responde 200, útil para demo |
-| Variables de entorno | `backend/.env.example` | `TRENDINGCAST_PROGRAM_ID`, `FACILITATOR_URL`, `RPC_URL` |
+| Variables de entorno | `backend/.env.example` | `TRENDSURGE_PROGRAM_ID`, `FACILITATOR_URL`, `RPC_URL` |
 
 ### Frontend — `web/` (React 18 + Vite + Tailwind)
 
@@ -50,7 +50,7 @@ Estado actual: smart contract deployado en devnet (7/8 tests passing). Backend y
 | Página: marketplace de templates | `web/src/pages/Marketplace.tsx` | Lista templates con precio y creator |
 | Flujo de compra x402 | `web/src/lib/buy.ts` | Llama backend con header `X-PAYMENT`; usa `x402-solana/client` |
 | Página: perfil de streamer | `web/src/pages/Profile.tsx` | Muestra reputación, ventas, historial |
-| Variables de entorno | `web/.env.example` | `VITE_TRENDINGCAST_PROGRAM_ID`, `VITE_BACKEND_URL` |
+| Variables de entorno | `web/.env.example` | `VITE_TRENDSURGE_PROGRAM_ID`, `VITE_BACKEND_URL` |
 
 ### Integración y demo
 

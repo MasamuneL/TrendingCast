@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::constants::*;
-use crate::errors::TrendingCastError;
+use crate::errors::TrendSurgeError;
 use crate::state::StreamerProfile;
 
 #[derive(Accounts)]
@@ -23,14 +23,14 @@ pub struct CreateProfile<'info> {
 pub fn handler(ctx: Context<CreateProfile>, category: String, hours: Vec<u8>) -> Result<()> {
     require!(
         category.len() > 0 && category.len() <= 32 && category.bytes().any(|b| b != b' '),
-        TrendingCastError::InvalidCategory
+        TrendSurgeError::InvalidCategory
     );
     require!(
         hours.len() <= MAX_HOURS_PER_PROFILE,
-        TrendingCastError::InvalidHour
+        TrendSurgeError::InvalidHour
     );
     for &h in &hours {
-        require!(h < 24, TrendingCastError::InvalidHour);
+        require!(h < 24, TrendSurgeError::InvalidHour);
     }
 
     let profile = &mut ctx.accounts.profile;

@@ -29,13 +29,13 @@ export const getProgram = (): AnyProgram => {
     commitment: "confirmed",
   });
 
-  const idlPath = path.resolve(__dirname, "../../../target/idl/trendingcast.json");
+  const idlPath = path.resolve(__dirname, "../../../target/idl/trendsurge.json");
   const idl = JSON.parse(fs.readFileSync(idlPath, "utf-8"));
   // target IDL may have the old program ID — override with the one from env
-  if (!process.env.TRENDINGCAST_PROGRAM_ID) {
-    throw new Error("TRENDINGCAST_PROGRAM_ID env var not set — refusing to start with wrong program");
+  if (!process.env.TRENDSURGE_PROGRAM_ID) {
+    throw new Error("TRENDSURGE_PROGRAM_ID env var not set — refusing to start with wrong program");
   }
-  idl.address = process.env.TRENDINGCAST_PROGRAM_ID;
+  idl.address = process.env.TRENDSURGE_PROGRAM_ID;
 
   _program = new Program(idl, provider);
   return _program;
