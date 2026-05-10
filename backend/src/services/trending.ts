@@ -8,14 +8,22 @@ interface TrendingData {
   peakHours: number[];
 }
 
-// fallback si Twitch no está configurado o falla
-const FALLBACK_BY_CATEGORY: Record<string, TrendingData> = {
-  gaming: { topics: ["Minecraft", "Valorant", "Speedrun"], peakHours: [20, 21, 22] },
-  music: { topics: ["Lo-fi", "Live Session", "Beat Making"], peakHours: [18, 19, 20] },
-  cooking: { topics: ["Quick Meals", "Street Food", "Baking"], peakHours: [11, 12, 19] },
-  sports: { topics: ["Highlights", "Match Reaction", "Training"], peakHours: [15, 20, 21] },
-  default: { topics: ["Trending Now", "Live Reaction", "Community Stream"], peakHours: [20, 21, 22] },
+// fallback si Twitch no está configurado o falla — pool amplio para que roten
+const FALLBACK_POOL: Record<string, { topics: string[]; peakHours: number[] }> = {
+  gaming:    { topics: ["Minecraft", "Valorant", "Speedrun", "Fortnite", "GTA V", "Elden Ring", "League of Legends", "Apex Legends"], peakHours: [19, 20, 21, 22] },
+  music:     { topics: ["Lo-fi", "Live Session", "Beat Making", "Covers", "Piano Jazz", "Hip-hop Beats", "Guitarra Acústica"], peakHours: [18, 19, 20, 22] },
+  irl:       { topics: ["Street Food Tour", "City Walk", "Travel Vlog", "Mercado Local", "Sunset Walk", "Café Crawl"], peakHours: [11, 15, 18, 20] },
+  art:       { topics: ["Digital Art", "Character Design", "Speed Paint", "Pixel Art", "Ilustración", "Tattoo Design"], peakHours: [16, 18, 20, 21] },
+  tech:      { topics: ["Solana Dev", "Web3 Tutorial", "React en vivo", "Open Source", "AI Hacking", "CLI Tools"], peakHours: [17, 18, 20, 21] },
+  sports:    { topics: ["Match Reaction", "Training Session", "Highlights", "Draft Analysis", "Fantasy Sports"], peakHours: [15, 18, 20, 21] },
+  education: { topics: ["Español Rápido", "Math Live", "Historia Interactiva", "Coding 101", "Finance Basics"], peakHours: [10, 12, 17, 19] },
+  default:   { topics: ["Trending Now", "Live Reaction", "Community Stream", "Q&A Session", "Chill Stream"], peakHours: [19, 20, 21, 22] },
 };
+
+function sampleTopics(pool: string[], n = 3): string[] {
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n);
+}
 
 let _twitchToken: string | null = null;
 let _tokenExpiry = 0;
@@ -67,17 +75,21 @@ const getTopGames = async (): Promise<TwitchGame[]> => {
 };
 
 export const getTrendingForCategory = async (category: string): Promise<TrendingData> => {
+  const key = category.toLowerCase();
+  const fallback = FALLBACK_POOL[key] ?? FALLBACK_POOL.default;
+
   if (!process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET) {
-    return FALLBACK_BY_CATEGORY[category] ?? FALLBACK_BY_CATEGORY.default;
+    return { topics: sampleTopics(fallback.topics), peakHours: fallback.peakHours };
   }
 
   try {
     const games = await getTopGames();
-    const topics = games.slice(0, 3).map((g) => g.name);
-    const fallback = FALLBACK_BY_CATEGORY[category] ?? FALLBACK_BY_CATEGORY.default;
+    // Shuffle Twitch results so no siempre son los mismos top 3
+    const shuffled = [...games].sort(() => Math.random() - 0.5);
+    const topics = shuffled.slice(0, 3).map((g) => g.name);
     return { topics, peakHours: fallback.peakHours };
   } catch (err) {
     console.error("[trending] Twitch API error, using fallback:", err);
-    return FALLBACK_BY_CATEGORY[category] ?? FALLBACK_BY_CATEGORY.default;
+    return { topics: sampleTopics(fallback.topics), peakHours: fallback.peakHours };
   }
 };

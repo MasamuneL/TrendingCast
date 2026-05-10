@@ -18,6 +18,12 @@ export const getRecommendationData = async (streamerWallet: string): Promise<Rec
   const streamer = new PublicKey(streamerWallet);
 
   const [profilePDA] = findProfilePDA(streamer);
+
+  // Verificar existencia antes de fetch para normalizar el error independientemente de la versión de Anchor
+  const accountInfo = await getProgram().provider.connection.getAccountInfo(profilePDA);
+  if (!accountInfo) {
+    throw new Error("account not found");
+  }
   const profile = await accs.streamerProfile.fetch(profilePDA);
 
   const category: string = profile.category;
