@@ -5,12 +5,12 @@ const router = Router();
 
 const CATEGORIES = ["gaming", "irl", "music", "art", "tech", "sports", "education"];
 
-function generateTags(topic: string, category: string): string[] {
+function buildTags(topic: string, category: string): string[] {
   const words = topic.split(/[\s\-_]+/).filter((w) => w.length > 2);
   return [...new Set([category.charAt(0).toUpperCase() + category.slice(1), ...words])].slice(0, 3);
 }
 
-// GET /trending?category=Gaming
+// GET /trending?category=Gaming  — returns TrendingTopic[] for the frontend
 router.get("/", async (req: Request, res: Response) => {
   const cat = (req.query.category as string | undefined)?.toLowerCase();
   const cats = cat && CATEGORIES.includes(cat) ? [cat] : CATEGORIES;
@@ -19,15 +19,13 @@ router.get("/", async (req: Request, res: Response) => {
     const results = await Promise.all(
       cats.map(async (c) => {
         const data = await getTrendingForCategory(c);
-        // Score base decreciente por posición + jitter aleatorio para que no sean idénticos
-        const baseScore = 90 + Math.floor(Math.random() * 10);
         return data.topics.map((topic, i) => ({
           id: `${c}-${topic.replace(/\s+/g, "-").toLowerCase()}-${Date.now()}-${i}`,
           title: topic,
           category: c,
-          score: Math.max(10, baseScore - i * 10 - Math.floor(Math.random() * 8)),
+          score: Math.round(1000 - i * 80 - Math.random() * 30),
           bestStreamHour: data.peakHours[Math.floor(Math.random() * data.peakHours.length)] ?? 20,
-          tags: generateTags(topic, c),
+          tags: buildTags(topic, c),
         }));
       })
     );
