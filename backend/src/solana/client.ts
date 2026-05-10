@@ -29,7 +29,10 @@ export const getProgram = (): AnyProgram => {
     commitment: "confirmed",
   });
 
-  const idlPath = path.resolve(__dirname, "../../../target/idl/trendsurge.json");
+  // Primero intenta el IDL generado por anchor build; si no existe usa la copia del frontend
+  const idlPrimary = path.resolve(__dirname, "../../../target/idl/trendsurge.json");
+  const idlFallback = path.resolve(__dirname, "../../../web/src/lib/trendsurge.json");
+  const idlPath = fs.existsSync(idlPrimary) ? idlPrimary : idlFallback;
   const idl = JSON.parse(fs.readFileSync(idlPath, "utf-8"));
   // target IDL may have the old program ID — override with the one from env
   if (!process.env.TRENDSURGE_PROGRAM_ID) {
