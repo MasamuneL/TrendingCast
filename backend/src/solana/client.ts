@@ -15,9 +15,22 @@ let _program: AnyProgram | null = null;
 export const getProgram = (): AnyProgram => {
   if (_program) return _program;
 
-  const keypairPath = process.env.WALLET_KEYPAIR_PATH ?? path.join(os.homedir(), ".config", "solana", "id.json");
-  const keypairData = JSON.parse(fs.readFileSync(keypairPath, "utf-8"));
-  const keypair = Keypair.fromSecretKey(Uint8Array.from(keypairData));
+  // Expandir ~ manualmente (Node no lo hace en Windows)
+  const rawPath = process.env.WALLET_KEYPAIR_PATH ?? "~/.config/solana/id.json";
+  const keypairPath = rawPath.startsWith("~")
+    ? path.join(os.homedir(), rawPath.slice(1))
+    : rawPath;
+
+  let keypair: Keypair;
+  try {
+    const keypairData = JSON.parse(fs.readFileSync(keypairPath, "utf-8"));
+    keypair = Keypair.fromSecretKey(Uint8Array.from(keypairData));
+  } catch {
+    // Sin keypair configurado: usar uno temporal para operaciones de lectura.
+    // Las escrituras on-chain las firma el frontend (Option B signer flow).
+    console.warn("[client] Keypair no encontrado en %s — usando keypair temporal (solo lectura)", keypairPath);
+    keypair = Keypair.generate();
+  }
 
   const connection = new Connection(
     process.env.RPC_URL ?? "https://api.devnet.solana.com",
