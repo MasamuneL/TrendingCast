@@ -72,69 +72,87 @@ x402 facilitator: `https://x402.org/facilitator`
 
 - [Rust](https://rustup.rs/) stable
 - [Solana CLI 3.1.x (Agave)](https://docs.solanalabs.com/cli/install)
-- [Anchor CLI 0.31+](https://www.anchor-lang.com/docs/installation) (`cargo install --git https://github.com/coral-xyz/anchor anchor-cli`)
-- Node 20+ (use [fnm](https://github.com/Schniz/fnm): `fnm install 20 && fnm use 20`)
+- [Anchor CLI 1.0.x](https://www.anchor-lang.com/docs/installation) — install via `cargo install --git https://github.com/coral-xyz/anchor avm && avm install latest && avm use latest`
+- Node 20+ — recommended via [fnm](https://github.com/Schniz/fnm): `fnm install 20 && fnm use 20`
+- [Phantom](https://phantom.app) or [Solflare](https://solflare.com) browser extension (for the frontend)
 
-### 1. Clone and install
+### 1. Clone
 
 ```bash
 git clone https://github.com/MasamuneL/TrendSurge.git
 cd TrendSurge
-npm install
 ```
 
 ### 2. Configure Solana wallet
 
 ```bash
 solana config set --url devnet
-solana config set --keypair ~/.config/solana/id.json
+# generate a wallet if you don't have one
+solana-keygen new --outfile ~/.config/solana/id.json
 ```
 
-Fund the wallet with devnet SOL: https://faucet.solana.com
+Fund it with devnet SOL: https://faucet.solana.com  
+Fund it with devnet USDC: https://faucet.circle.com (needed to test purchases)
 
-### 3. Build the smart contract
+### 3. Build and deploy the smart contract
 
 ```bash
 anchor build
-```
-
-> If `anchor build` generates a new Program ID, sync it with:
-> ```bash
-> anchor keys sync
-> ```
-> Then update `declare_id!` in `programs/trendsurge/src/lib.rs` and `Anchor.toml`.
-
-### 4. Deploy to devnet
-
-```bash
 anchor deploy --provider.cluster devnet
 ```
 
-### 5. Run tests
+> If `anchor build` generates a new Program ID, run `anchor keys sync`, then update `declare_id!` in `programs/trendsurge/src/lib.rs`, `Anchor.toml`, `backend/.env`, and `web/.env`.
+
+### 4. Run contract tests
 
 ```bash
 anchor test --skip-local-validator --provider.cluster devnet
 ```
 
-Expected output: **7 passing, 1 pending** (distribute_rewards skipped — requires a live TREND mint).
-
-### 6. Backend
+### 5. Backend
 
 ```bash
 cd backend
-cp .env.example .env   # fill in TRENDSURGE_PROGRAM_ID and FACILITATOR_URL
-npm install
-npm run dev
+cp .env.example .env
 ```
 
-### 7. Frontend
+Open `backend/.env` and fill in:
+
+| Variable | Description |
+|----------|-------------|
+| `TRENDSURGE_PROGRAM_ID` | Program ID from step 3 (default is the deployed devnet address) |
+| `WALLET_ADDRESS` | Your devnet wallet address in base58 — receives USDC from purchases (production only) |
+| `WALLET_KEYPAIR_PATH` | Path to your `id.json` keypair — optional, a temporary keypair is used if missing |
+| `TWITCH_CLIENT_ID` / `TWITCH_CLIENT_SECRET` | Optional — enables live trending data from Twitch. Create an app at [dev.twitch.tv](https://dev.twitch.tv/console). Falls back to static data if not set. |
+
+```bash
+npm install
+npm run dev        # starts on http://localhost:3000
+```
+
+> In `NODE_ENV=development` the x402 paywall is disabled. Send `x-bypass-payment: true` header to skip payment in local testing (the frontend does this automatically in dev mode).
+
+### 6. Frontend
 
 ```bash
 cd web
-cp .env.example .env   # fill in VITE_TRENDSURGE_PROGRAM_ID
-npm install
-npm run dev
+cp .env.example .env
 ```
+
+Open `web/.env` and fill in:
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_TRENDSURGE_PROGRAM_ID` | Same Program ID as the backend |
+| `VITE_SOLANA_RPC` | RPC endpoint — default is `https://api.devnet.solana.com` |
+| `VITE_BACKEND_URL` | Backend URL — default is `http://localhost:3000` |
+
+```bash
+npm install
+npm run dev        # starts on http://localhost:5173
+```
+
+Connect Phantom or Solflare to **Solana Devnet** before using the app.
 
 ---
 
