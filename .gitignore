@@ -3,5 +3,6 @@
 **/.env.*.local
 node_modules/
 target/
+dist/
 **/*-keypair.json
 .DS_Store
