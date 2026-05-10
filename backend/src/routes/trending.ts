@@ -5,6 +5,12 @@ const router = Router();
 
 const CATEGORIES = ["gaming", "irl", "music", "art", "tech", "sports", "education"];
 
+function buildTags(title: string, category: string): string[] {
+  const words = title.split(/\s+/).filter((w) => w.length > 2);
+  const cat = category.charAt(0).toUpperCase() + category.slice(1);
+  return [...new Set([...words, cat])].slice(0, 3);
+}
+
 // GET /trending?category=Gaming  — returns TrendingTopic[] for the frontend
 router.get("/", async (req: Request, res: Response) => {
   const cat = (req.query.category as string | undefined)?.toLowerCase();
@@ -18,9 +24,9 @@ router.get("/", async (req: Request, res: Response) => {
           id: `${c}-${i}`,
           title: topic,
           category: c,
-          score: 100 - i * 15,
-          bestStreamHour: data.peakHours[0] ?? 20,
-          tags: data.peakHours.map((h: number) => `${h}:00`),
+          score: Math.round(1000 - i * 80 - Math.random() * 30),
+          bestStreamHour: data.peakHours[i % data.peakHours.length] ?? 20,
+          tags: buildTags(topic, c),
         }));
       })
     );
